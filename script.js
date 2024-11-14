@@ -1,7 +1,12 @@
+//ctrl+shift+L allows you to select all similar values, use with caution!
+
 let canvas = document.getElementById("canvas");
 // .getContent Returns a static collection of nodes representing the flow's source content.
 let context = canvas.getContext("2d");
 //to set it to a px size you don't need speech marks or 'px' at the end.
+    
+let canvasOffset = canvas.getBoundingClientRect();
+
 canvas.width = 900;
 canvas.height = 900;
 
@@ -15,7 +20,7 @@ let canvasWidth = canvas.width;
 let canvasHeight = canvas.height;
 // console.log("canvas height = ", canvasHeight);
 
-let currentShape;
+let currentCar;
 let startX;
 let startY;
 //holds values that apply when the page is scaled (?)
@@ -25,35 +30,53 @@ let zoneStartX;
 let zoneStartY;
 
 let gridRef;
+let isDragging;
+let currentCarIndex;
 
-let rotateClicked
 
 let cellCoords = {
     "A1": { x: 0, y: 0 },
-    "A2": { x: 200, y: 0 },
-    "A3": { x: 400, y: 0 },
-    "A4": { x: 600, y: 0 },
-    "A5": { x: 800, y: 0 },
-    "B1": { x: 0, y: 200 },
-    "B2": { x: 200, y: 200 },
-    "B3": { x: 400, y: 200 },
-    "B4": { x: 600, y: 200 },
-    "B5": { x: 800, y: 200 },
-    "C1": { x: 0, y: 400 },
-    "C2": { x: 200, y: 400 },
-    "C3": { x: 400, y: 400 },
-    "C4": { x: 600, y: 400 },
-    "C5": { x: 800, y: 400 },
-    "D1": { x: 0, y: 600 },
-    "D2": { x: 200, y: 600 },
-    "D3": { x: 400, y: 600 },
-    "D4": { x: 600, y: 600 },
-    "D5": { x: 800, y: 600 },
-    "E1": { x: 0, y: 800 },
-    "E2": { x: 200, y: 800 },
-    "E3": { x: 400, y: 800 },
-    "E4": { x: 600, y: 800 },
-    "E5": { x: 800, y: 800 },
+    "A2": { x: 150, y: 0 },
+    "A3": { x: 300, y: 0 },
+    "A4": { x: 450, y: 0 },
+    "A5": { x: 600, y: 0 },
+    "A6": { x: 750, y: 0 },
+    
+    "B1": { x: 0, y: 150 },
+    "B2": { x: 150, y: 150 },
+    "B3": { x: 300, y: 150 },
+    "B4": { x: 450, y: 150 },
+    "B5": { x: 600, y: 150 },
+    "B6": { x: 750, y: 150 },
+    
+    "C1": { x: 0, y: 300 },
+    "C2": { x: 150, y: 300 },
+    "C3": { x: 300, y: 300 },
+    "C4": { x: 450, y: 300 },
+    "C5": { x: 600, y: 300 },
+    "C6": { x: 750, y: 300 },
+
+    "D1": { x: 0, y: 450 },
+    "D2": { x: 150, y: 450},
+    "D3": { x: 300, y: 450},
+    "D4": { x: 450, y: 450},
+    "D5": { x: 600, y: 450},
+    "D6": { x: 750, y: 450},
+
+    "E1": { x: 0, y: 600 },
+    "E2": { x: 150, y: 600 },
+    "E3": { x: 300, y: 600 },
+    "E4": { x: 450, y: 600 },
+    "E5": { x: 600, y: 600 },
+    "E6": { x: 750, y: 600 },
+
+    "F1": { x: 0, y: 750 },
+    "F2": { x: 150, y: 750 },
+    "F3": { x: 300, y: 750 },
+    "F4": { x: 450, y: 750 },
+    "F5": { x: 600, y: 750 },
+    "F6": { x: 750, y: 750 },
+
 };
 
 
@@ -108,10 +131,10 @@ function backgroundCanvasImg() {
 let zones = [];
 
 //set bounding areas for squares
-let zoneWidth = 200;
-let zoneHeight = 200;
-let numRows = 5; // Number of rows
-let numCols = 5; // Number of columns
+let zoneWidth = 150;
+let zoneHeight = 150;
+let numRows = 6; // Number of rows
+let numCols = 6; // Number of columns
 
 // nested for loops, goes along the top row first
 for (let row = 0; row < numRows; row++) {
@@ -129,13 +152,11 @@ for (let row = 0; row < numRows; row++) {
             zoneName: `${String.fromCharCode(97 + row)}${col + 1}` // For example, "a1", "a2", ..., "b1", "b2", ...
         };
         //pushes the new object to the array
-        zones.push(zone);
     }
 }
 
 // getBoundingClientRect returns the size of an element and its position relative to the viewport, deals with screen re-sizing
 function getOffset() {
-    let canvasOffset = canvas.getBoundingClientRect();
     offsetX = canvasOffset.left;
     offsetY = canvasOffset.top;
 }
@@ -145,9 +166,214 @@ window.onscroll = function () { getOffset(); }
 window.onresize = function () { getOffset(); }
 canvas.onresize = function () { getOffset(); }
 
+//Draw shapes
+let cars = [];
+cars.push({ x: 150, y: 150, width: 150, height: 150, color: 'green'});
+
+function drawCars () {
+    for (let car of cars) {
+        context.fillStyle = car.color; //Sets the fillstyle e.g. colour
+        context.fillRect(car.x, car.y, car.width, car.height) //the fillRect() method draws a "filled" rectangle.
+    }
+}
+drawCars();
+
+function getMousePosition(event) {
+
+    let x = event.clientX - canvasOffset.left -4; //minus 4 solved the slight offset issue from line width/border
+    let y = event.clientY - canvasOffset.top -4;
+    //console.log("Coordinate x: " + x, "Coordinate y: " + y); 
+    checkCellRef(x,y)
+}
+
+canvas.addEventListener("mousedown", function (e) {
+    getMousePosition(e); 
+    //run a check to see which cell the mouse is in 
+    
+}); 
+
+function checkCellRef (x,y) {
+    let row;
+    let column;
+    
+    //column
+    if (x<150) {  
+        column = "A"
+    } 
+    else if (x<300) { 
+        column = "B"
+    }
+    else if (x<450) {  
+        column = "C"
+    }
+    else if (x<600) {  
+        column = "D"
+    }
+    else if (x<750) {
+        column = "E"
+    } else if (x<900) {
+        column = "F"
+    }
+    
+    //Row
+        if (y<150) {  
+        row = "1"
+    } 
+    else if (y<300) { 
+        row = "2"
+    }
+    else if (y<450) {  
+        row = "3"
+    }
+    else if (y<600) {  
+        row = "4"
+    }
+    else if (y<750) {
+        row = "5"
+    } else if (y<900) {
+        row = "6"
+    }
+
+    let cellRef = String(column) + String(row);
+    console.log(cellRef);
+}
+
+//move the cars
+
+//onmousedown these functions are triggered
+function mouseDown(e) {
+    e.preventDefault();
+
+    startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
+    startY = parseInt(e.clientY - offsetY); //clientY property returns the horizontal client coordinate of the mouse pointer
+
+    for (let i = 0; i < cars.length; i++) {
+        let car = cars[i];
+        if (isMouseInShape(startX, startY, car)) {
+            
+                // Regular dragging behavior
+                currentCarIndex = i;
+                isDragging = true;
+                return;
+            
+        }
+    }
+}
 
 
+//find the middle point of the moving object
+function findMiddlePoint() {
+    //current shapes index needs to be used here or all the shapes default to the square of the first one.
+    middlePointLocation.x = cars[currentCarIndex].x + 100;
+    middlePointLocation.y = cars[currentCarIndex].y + 100;
+    // console.log("middle point location =", middlePointLocation);
+}
 
+
+// mouse up event
+function mouseUp(e) {
+    if (!isDragging) {
+        return;
+    } else {
+        e.preventDefault();
+        findMiddlePoint();
+        isDragging = false;
+
+    }
+}
+
+function mouseOut(e) {
+    if (!isDragging) {
+        return;
+    } else {
+        e.preventDefault();
+        isDragging = false;
+    }
+}
+
+function mouseMove(e) {
+    if (!isDragging) {
+        return;
+    } else {
+
+        // console.log("move with dragging");
+        e.preventDefault();
+        let mouseX = parseInt(e.clientX - offsetX);
+        let mouseY = parseInt(e.clientY - offsetY);
+
+        let mouseMoveDistanceX = mouseX - startX;
+        let mouseMoveDistanceY = mouseY - startY;
+        // console.log("distance from click, mouse X and mouse Y ", mouseMoveDistanceX, mouseMoveDistanceY)
+
+        currentCar = cars[currentCarIndex];
+        // console.log(currentShape);
+        //updates the value of the shapes x and y co-ordinates
+        currentCar.x += mouseMoveDistanceX;
+        currentCar.y += mouseMoveDistanceY;
+
+        drawShapes(); //live draws the shape so it can be physically dragged
+        //console.log("square is moving")
+        startX = mouseX;
+        startY = mouseY;
+    }
+}
+
+// listens for the mousedown event on the canvas
+canvas.onmousedown = mouseDown;
+canvas.onmouseup = mouseUp;
+canvas.onmouseout = mouseOut;
+canvas.onmousemove = mouseMove;
+
+//checks to see if the mouse is inside a shape
+function isMouseInShape(x, y, car) {
+    let carLeft = car.x;
+    let carRight = car.x + car.width;
+    let carTop = car.y;
+    let carBottom = car.y + car.height;
+
+    if (x > carLeft && x < carRight && y > carTop && y < carBottom) {
+        //console.log("is inside shape");
+        return true;
+    } else {
+        // console.log("not inside shape");
+        return false;
+    }
+}
+
+async function drawShapes() {
+
+    //console.log(tileName);
+
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawHorizGrid();
+    drawVertGrid();
+
+    for (let car of cars) {
+
+        //test before image is drawn to see if the correct values for imgSrc have arrived at the drawShapes function
+        if (!isDragging && rotateClicked == true) {
+            //console.log(shape.imgSrc, "in cell", shape.currentCell ) 
+        }
+
+    }
+
+    for (let car of cars) {
+
+        context.save(); // Save the current state
+        context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
+        context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
+       
+       
+            // Draw the shape with color (fallback)
+            context.fillStyle = car.color;
+            context.fillRect(0, 0, car.width, car.height);
+            console.log("Something has gone amiss")
+    
+
+        //this section deals primarily with the rotate button:   
+        context.restore(); // Restore the previous state, this keeps the dot when tiles are moved.     
+    }
+};
 
 
 //.forEach
