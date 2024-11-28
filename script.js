@@ -152,6 +152,7 @@ for (let row = 0; row < numRows; row++) {
             zoneName: `${String.fromCharCode(97 + row)}${col + 1}` // For example, "a1", "a2", ..., "b1", "b2", ...
         };
         //pushes the new object to the array
+        
     }
 }
 
@@ -168,7 +169,8 @@ canvas.onresize = function () { getOffset(); }
 
 //Draw shapes
 let cars = [];
-cars.push({ x: 150, y: 150, width: 150, height: 150, color: 'green'});
+cars.push({ x: 150, y: 150, width: 300, height: 150, color: 'green', orientation:'hrz'});
+cars.push({ x: 450, y: 300, width: 150, height: 300, color: 'red', orientation:'vrt'});
 
 function drawCars () {
     for (let car of cars) {
@@ -245,16 +247,20 @@ function mouseDown(e) {
     e.preventDefault();
 
     startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
-    startY = parseInt(e.clientY - offsetY); //clientY property returns the horizontal client coordinate of the mouse pointer
-
+    startY = parseInt(e.clientY - offsetY); //clientY property returns the vertical client coordinate of the mouse pointer
+    console.log(startY);
     for (let i = 0; i < cars.length; i++) {
         let car = cars[i];
         if (isMouseInShape(startX, startY, car)) {
             
+            //if width is greater than height, constrain movement to x axis
+           
+
                 // Regular dragging behavior
                 currentCarIndex = i;
                 isDragging = true;
                 return;
+            
             
         }
     }
@@ -266,7 +272,7 @@ function findMiddlePoint() {
     //current shapes index needs to be used here or all the shapes default to the square of the first one.
     middlePointLocation.x = cars[currentCarIndex].x + 100;
     middlePointLocation.y = cars[currentCarIndex].y + 100;
-    // console.log("middle point location =", middlePointLocation);
+    console.log("middle point location =", middlePointLocation);
 }
 
 
@@ -295,8 +301,9 @@ function mouseMove(e) {
     if (!isDragging) {
         return;
     } else {
+        
 
-        // console.log("move with dragging");
+        //console.log("move with dragging");
         e.preventDefault();
         let mouseX = parseInt(e.clientX - offsetX);
         let mouseY = parseInt(e.clientY - offsetY);
@@ -308,15 +315,24 @@ function mouseMove(e) {
         currentCar = cars[currentCarIndex];
         // console.log(currentShape);
         //updates the value of the shapes x and y co-ordinates
-        currentCar.x += mouseMoveDistanceX;
-        currentCar.y += mouseMoveDistanceY;
+        
+        if (currentCar.orientation == "hrz") {
+            //console.log(currentCar.orientation);
+            currentCar.x += mouseMoveDistanceX;
+            currentCar.y = currentCar.y;
+        } else if (currentCar.orientation == "vrt") {
+            currentCar.x = currentCar.x;
+            currentCar.y += mouseMoveDistanceY;
+        }
 
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
         startX = mouseX;
         startY = mouseY;
+        }
     }
-}
+
+
 
 // listens for the mousedown event on the canvas
 canvas.onmousedown = mouseDown;
@@ -339,6 +355,24 @@ function isMouseInShape(x, y, car) {
         return false;
     }
 }
+
+
+//Snaps tiles to the grid
+function snapTo() {
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawHorizGrid();
+    drawVertGrid();
+
+    for (let car of cars) {
+
+            // Draw the shape with color (fallback)
+            context.fillStyle = shape.color;
+            context.fillRect(shape.x, shape.y, shape.width, shape.height);
+
+    }
+}
+
+
 
 async function drawShapes() {
 
@@ -367,10 +401,8 @@ async function drawShapes() {
             // Draw the shape with color (fallback)
             context.fillStyle = car.color;
             context.fillRect(0, 0, car.width, car.height);
-            console.log("Something has gone amiss")
-    
-
-        //this section deals primarily with the rotate button:   
+           
+            //this section deals primarily with the rotate button:   
         context.restore(); // Restore the previous state, this keeps the dot when tiles are moved.     
     }
 };
