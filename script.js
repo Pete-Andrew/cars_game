@@ -345,7 +345,6 @@ function mouseMove(e) {
             cars[currentCarIndex].y = 0;
         }
 
-
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
         startX = mouseX;
@@ -377,16 +376,39 @@ function isMouseInShape(x, y, car) {
     }
 }
 
-//BUG!
-//need to update this function!!! 
-//Snaps tiles to the grid
 function snapTo() {
 
+    let leftEdgeLocation = cars[currentCarIndex].x;
+    let topEdgeLocation = cars[currentCarIndex].y;
     //get edge value, snap to the nearest multiple of 150
-    console.log(cars[currentCarIndex].x);
+    console.log("left edge location = " + leftEdgeLocation);
+    console.log("top edge location = " + topEdgeLocation);
     //needs to be the closest multiple of 150
     //needs to search in both directions from the if modulus of 150 returns 0
-    cars[currentCarIndex].x = 300;
+    //leftEdgeLocation % 150
+    //half of 150 is 75, therefore if the modulus number is below 75 then round down. If over 75 round up.
+    //clips the hrz cars
+    let modulusHrzRemainder = leftEdgeLocation % 150
+    console.log(modulusHrzRemainder);
+    if (modulusHrzRemainder < 75) {
+        //round up
+        cars[currentCarIndex].x = leftEdgeLocation - modulusHrzRemainder;
+    } else {
+        //roundDown
+        cars[currentCarIndex].x = ((150-modulusHrzRemainder) + leftEdgeLocation)
+    }
+
+    //clips the vert cars
+    let modulusVrtRemainder = topEdgeLocation % 150
+    console.log(modulusVrtRemainder);
+    if (modulusVrtRemainder < 75) {
+        //round up
+        cars[currentCarIndex].y = topEdgeLocation - modulusVrtRemainder;
+    } else {
+        //roundDown
+        cars[currentCarIndex].y = ((150-modulusVrtRemainder) + topEdgeLocation)
+    }
+
     drawShapes();
 }
 
@@ -403,8 +425,7 @@ async function drawShapes() {
         context.save(); // Save the current state, required
         context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
         context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
-       
-       
+    
             // Draw the shape with color (fallback)
             context.fillStyle = car.color;
             context.fillRect(0, 0, car.width, car.height);
