@@ -248,14 +248,11 @@ function mouseDown(e) {
 
     startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
     startY = parseInt(e.clientY - offsetY); //clientY property returns the vertical client coordinate of the mouse pointer
-    console.log(startY);
+    console.log("Y axis "+ startY, "\nX axis " + startX);
+    
     for (let i = 0; i < cars.length; i++) {
         let car = cars[i];
-        if (isMouseInShape(startX, startY, car)) {
-            
-            //if width is greater than height, constrain movement to x axis
-           
-
+        if (isMouseInShape(startX, startY, car)) {        
                 // Regular dragging behavior
                 currentCarIndex = i;
                 isDragging = true;
@@ -272,7 +269,9 @@ function findMiddlePoint() {
     //current shapes index needs to be used here or all the shapes default to the square of the first one.
     middlePointLocation.x = cars[currentCarIndex].x + 100;
     middlePointLocation.y = cars[currentCarIndex].y + 100;
-    console.log("middle point location =", middlePointLocation);
+    //console.log("middle point location =", middlePointLocation);
+    console.log("left hand side edge x co-ordinate = " + cars[currentCarIndex].x);
+    console.log("left hand side edge y co-ordinate = " + cars[currentCarIndex].y);
 }
 
 
@@ -284,7 +283,7 @@ function mouseUp(e) {
         e.preventDefault();
         findMiddlePoint();
         isDragging = false;
-
+        snapTo();
     }
 }
 
@@ -325,6 +324,28 @@ function mouseMove(e) {
             currentCar.y += mouseMoveDistanceY;
         }
 
+        //prevents car leaving grid on x axis
+        //need to create a car length variable to calculate the end bounds
+        if (cars[currentCarIndex].x > 600) {
+            console.log("out of bounds");
+            cars[currentCarIndex].x = 600;
+        }
+        if (cars[currentCarIndex].x < 1) {
+            console.log("out of bounds");
+            cars[currentCarIndex].x = 0;
+        }
+
+         //prevents car leaving grid on y axis
+        if (cars[currentCarIndex].y > 600) {
+            console.log("out of bounds");
+            cars[currentCarIndex].y = 600;
+        }
+        if (cars[currentCarIndex].y < 1) {
+            console.log("out of bounds");
+            cars[currentCarIndex].y = 0;
+        }
+
+
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
         startX = mouseX;
@@ -356,23 +377,18 @@ function isMouseInShape(x, y, car) {
     }
 }
 
-
+//BUG!
+//need to update this function!!! 
 //Snaps tiles to the grid
 function snapTo() {
-    context.clearRect(0, 0, canvasWidth, canvasHeight);
-    drawHorizGrid();
-    drawVertGrid();
 
-    for (let car of cars) {
-
-            // Draw the shape with color (fallback)
-            context.fillStyle = shape.color;
-            context.fillRect(shape.x, shape.y, shape.width, shape.height);
-
-    }
+    //get edge value, snap to the nearest multiple of 150
+    console.log(cars[currentCarIndex].x);
+    //needs to be the closest multiple of 150
+    //needs to search in both directions from the if modulus of 150 returns 0
+    cars[currentCarIndex].x = 300;
+    drawShapes();
 }
-
-
 
 async function drawShapes() {
 
@@ -384,16 +400,7 @@ async function drawShapes() {
 
     for (let car of cars) {
 
-        //test before image is drawn to see if the correct values for imgSrc have arrived at the drawShapes function
-        if (!isDragging && rotateClicked == true) {
-            //console.log(shape.imgSrc, "in cell", shape.currentCell ) 
-        }
-
-    }
-
-    for (let car of cars) {
-
-        context.save(); // Save the current state
+        context.save(); // Save the current state, required
         context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
         context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
        
@@ -403,7 +410,7 @@ async function drawShapes() {
             context.fillRect(0, 0, car.width, car.height);
            
             //this section deals primarily with the rotate button:   
-        context.restore(); // Restore the previous state, this keeps the dot when tiles are moved.     
+        context.restore(); // Restore the previous state     
     }
 };
 
