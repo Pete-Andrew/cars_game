@@ -172,6 +172,7 @@ let cars = [];
 //x = leftEdge, y = bottomEdge, 
 cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'green', orientation:'hrz'});
 cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'red', orientation:'vrt'});
+cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'blue', orientation:'hrz'});
 
 function drawCars () {
     for (let car of cars) {
@@ -395,7 +396,7 @@ function snapTo() {
     //half of 150 is 75, therefore if the modulus number is below 75 then round down. If over 75 round up.
     //clips the hrz cars
     let modulusHrzRemainder = leftEdgeLocation % 150
-    console.log(modulusHrzRemainder);
+    //console.log(modulusHrzRemainder);
     if (modulusHrzRemainder < 75) {
         //round up
         cars[currentCarIndex].x = leftEdgeLocation - modulusHrzRemainder;
@@ -406,7 +407,7 @@ function snapTo() {
 
     //clips the vert cars
     let modulusVrtRemainder = topEdgeLocation % 150
-    console.log(modulusVrtRemainder);
+    //console.log(modulusVrtRemainder);
     if (modulusVrtRemainder < 75) {
         //round up
         cars[currentCarIndex].y = topEdgeLocation - modulusVrtRemainder;
@@ -429,10 +430,17 @@ function checkForOverLap () {
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
    
     //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
-    
-    //iterate through cars array to see if there is an overlap
-    //compare current car to others.
+     //compare current car to others.
     console.log(currentCar);//logs the details of the current car
+    
+    for (let car of cars) {
+        console.log("currentCar" , currentCar);
+        //check every car EXCEPT the current one
+        console.log(car.carLeftEdge)
+    }
+
+    //iterate through cars array to see if there is an overlap
+    
     //if leftEdge is > rightEdge of any car { console.log(car overlap);}
 
 
