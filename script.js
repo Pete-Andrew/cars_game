@@ -169,8 +169,9 @@ canvas.onresize = function () { getOffset(); }
 
 //Draw shapes
 let cars = [];
-cars.push({ x: 150, y: 150, width: 300, height: 150, color: 'green', orientation:'hrz'});
-cars.push({ x: 450, y: 300, width: 150, height: 300, color: 'red', orientation:'vrt'});
+//x = leftEdge, y = bottomEdge, 
+cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'green', orientation:'hrz'});
+cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'red', orientation:'vrt'});
 
 function drawCars () {
     for (let car of cars) {
@@ -296,6 +297,9 @@ function mouseOut(e) {
     }
 }
 
+
+//need to add object collisions to mouseMove
+
 function mouseMove(e) {
     if (!isDragging) {
         return;
@@ -312,7 +316,7 @@ function mouseMove(e) {
         // console.log("distance from click, mouse X and mouse Y ", mouseMoveDistanceX, mouseMoveDistanceY)
 
         currentCar = cars[currentCarIndex];
-        // console.log(currentShape);
+        //console.log(currentShape);
         //updates the value of the shapes x and y co-ordinates
         
         if (currentCar.orientation == "hrz") {
@@ -326,24 +330,28 @@ function mouseMove(e) {
 
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
-        if (cars[currentCarIndex].x > 600) {
+        if (currentCar.x > 600) {
             console.log("out of bounds");
-            cars[currentCarIndex].x = 600;
+            currentCar.x = 600;
         }
-        if (cars[currentCarIndex].x < 1) {
+        if (currentCar.x < 1) {
             console.log("out of bounds");
-            cars[currentCarIndex].x = 0;
+            currentCar.x = 0;
         }
 
          //prevents car leaving grid on y axis
-        if (cars[currentCarIndex].y > 600) {
+        if (currentCar.y > 600) {
             console.log("out of bounds");
-            cars[currentCarIndex].y = 600;
+            currentCar.y = 600;
         }
-        if (cars[currentCarIndex].y < 1) {
+        if (currentCar.y < 1) {
             console.log("out of bounds");
-            cars[currentCarIndex].y = 0;
+            currentCar.y = 0;
         }
+
+        //needs to be called live here
+        checkForOverLap();
+
 
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
@@ -351,8 +359,6 @@ function mouseMove(e) {
         startY = mouseY;
         }
     }
-
-
 
 // listens for the mousedown event on the canvas
 canvas.onmousedown = mouseDown;
@@ -381,8 +387,8 @@ function snapTo() {
     let leftEdgeLocation = cars[currentCarIndex].x;
     let topEdgeLocation = cars[currentCarIndex].y;
     //get edge value, snap to the nearest multiple of 150
-    console.log("left edge location = " + leftEdgeLocation);
-    console.log("top edge location = " + topEdgeLocation);
+    console.log("left edge location (x)= " + leftEdgeLocation);
+    console.log("top edge location (y) = " + topEdgeLocation);
     //needs to be the closest multiple of 150
     //needs to search in both directions from the if modulus of 150 returns 0
     //leftEdgeLocation % 150
@@ -409,8 +415,30 @@ function snapTo() {
         cars[currentCarIndex].y = ((150-modulusVrtRemainder) + topEdgeLocation)
     }
 
+    //checkForOverLap(); needs to be called live in the mouseMove function 
     drawShapes();
 }
+
+
+function checkForOverLap () {
+    //prevent car overlapping existing car
+    //need to get all of the cars edge co-ordinates
+    cars[currentCarIndex].carLeftEdge = currentCar.x;
+    cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
+    cars[currentCarIndex].carTop = currentCar.y; 
+    cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
+   
+    //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
+    
+    //iterate through cars array to see if there is an overlap
+    //compare current car to others.
+    console.log(currentCar);//logs the details of the current car
+    //if leftEdge is > rightEdge of any car { console.log(car overlap);}
+
+
+}
+
+
 
 async function drawShapes() {
 
