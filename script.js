@@ -10,15 +10,15 @@ let canvasOffset = canvas.getBoundingClientRect();
 canvas.width = 900;
 canvas.height = 900;
 
-// stores the value for the center of the cube
+//stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
 
 canvas.style.border = "5px solid black"
 
 let canvasWidth = canvas.width;
-// console.log("canvas width = ", canvasWidth);
+//console.log("canvas width = ", canvasWidth);
 let canvasHeight = canvas.height;
-// console.log("canvas height = ", canvasHeight);
+//console.log("canvas height = ", canvasHeight);
 
 let currentCar;
 let startX;
@@ -170,9 +170,9 @@ canvas.onresize = function () { getOffset(); }
 //Draw shapes
 let cars = [];
 //x = leftEdge, y = bottomEdge, 
-cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'green', orientation:'hrz'});
-cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'red', orientation:'vrt'});
-cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 0, carTop: 0, carBottom:0, color: 'blue', orientation:'hrz'});
+cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 150, carBottom:300, color: 'green', orientation:'hrz'});
+cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 300, carBottom:300, color: 'red', orientation:'vrt'});
+cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 300, carRightEdge: 600, carTop: 600, carBottom:750, color: 'blue', orientation:'hrz'});
 
 function drawCars () {
     for (let car of cars) {
@@ -259,8 +259,6 @@ function mouseDown(e) {
                 currentCarIndex = i;
                 isDragging = true;
                 return;
-            
-            
         }
     }
 }
@@ -300,7 +298,6 @@ function mouseOut(e) {
 
 
 //need to add object collisions to mouseMove
-
 function mouseMove(e) {
     if (!isDragging) {
         return;
@@ -424,6 +421,7 @@ function snapTo() {
 function checkForOverLap () {
     //prevent car overlapping existing car
     //need to get all of the cars edge co-ordinates
+    
     cars[currentCarIndex].carLeftEdge = currentCar.x;
     cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
     cars[currentCarIndex].carTop = currentCar.y; 
@@ -431,18 +429,44 @@ function checkForOverLap () {
    
     //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
      //compare current car to others.
-    console.log(currentCar);//logs the details of the current car
-    
-    for (let car of cars) {
-        console.log("currentCar" , currentCar);
-        //check every car EXCEPT the current one
-        console.log(car.carLeftEdge)
+    //console.log(currentCar);//logs the details of the current car
+
+    for (let i = 0; i < cars.length; i++) {
+        if (i === currentCarIndex) continue; //'continue' skips the current car in the array so it can be compared to others. 
+        //console.log("currentCar" , currentCar);
+        //check every against the current one
+        const otherCars = cars[i]; //creates a variable to compare the currentCar against. 
+
+        //iterate through cars array to see if there is an overlap
+        //Check for overlap using AABB collision detection
+        const overlapX =
+            currentCar.carRightEdge > otherCars.carLeftEdge &&
+            currentCar.carLeftEdge < otherCars.carRightEdge;
+        const overlapY =
+            currentCar.carBottom > otherCars.carTop &&
+            currentCar.carTop < otherCars.carBottom;
+
+     if (overlapX && overlapY) {
+        console.log("Overlap detected with car colour " + cars[i].color +" at cars index:", i); 
+        //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
+        //BUG overlap of single pixel can stop movement, need to put in a buffer
+
+        snapTo();
+        //if overlap is detected
+        //prevent further movement
+        //call snap to func
+
+
+
+        }      
+
+        //console.log(car.carLeftEdge)
     }
 
-    //iterate through cars array to see if there is an overlap
-    
-    //if leftEdge is > rightEdge of any car { console.log(car overlap);}
+    //y axis increases as it goes down
+    //x axis increases as it goes right
 
+    
 
 }
 
