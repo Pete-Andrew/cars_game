@@ -239,7 +239,7 @@ function checkCellRef (x,y) {
     }
 
     let cellRef = String(column) + String(row);
-    console.log(cellRef);
+    //console.log(cellRef);
 }
 
 //move the cars
@@ -250,7 +250,7 @@ function mouseDown(e) {
 
     startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
     startY = parseInt(e.clientY - offsetY); //clientY property returns the vertical client coordinate of the mouse pointer
-    console.log("Y axis "+ startY, "\nX axis " + startX);
+    //console.log("Y axis "+ startY, "\nX axis " + startX);
     
     for (let i = 0; i < cars.length; i++) {
         let car = cars[i];
@@ -270,8 +270,8 @@ function findMiddlePoint() {
     middlePointLocation.x = cars[currentCarIndex].x + 100;
     middlePointLocation.y = cars[currentCarIndex].y + 100;
     //console.log("middle point location =", middlePointLocation);
-    console.log("left hand side edge x co-ordinate = " + cars[currentCarIndex].x);
-    console.log("left hand side edge y co-ordinate = " + cars[currentCarIndex].y);
+    //console.log("left hand side edge x co-ordinate = " + cars[currentCarIndex].x);
+    //console.log("left hand side edge y co-ordinate = " + cars[currentCarIndex].y);
 }
 
 
@@ -385,8 +385,8 @@ function snapTo() {
     let leftEdgeLocation = cars[currentCarIndex].x;
     let topEdgeLocation = cars[currentCarIndex].y;
     //get edge value, snap to the nearest multiple of 150
-    console.log("left edge location (x)= " + leftEdgeLocation);
-    console.log("top edge location (y) = " + topEdgeLocation);
+    //console.log("left edge location (x)= " + leftEdgeLocation);
+    //console.log("top edge location (y) = " + topEdgeLocation);
     //needs to be the closest multiple of 150
     //needs to search in both directions from the if modulus of 150 returns 0
     //leftEdgeLocation % 150
@@ -413,6 +413,13 @@ function snapTo() {
         cars[currentCarIndex].y = ((150-modulusVrtRemainder) + topEdgeLocation)
     }
 
+    //update car location once they have been snapped to grid, this stops cars getting stuck on each other by tiny margins
+    cars[currentCarIndex].carLeftEdge = currentCar.x;
+    cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
+    cars[currentCarIndex].carTop = currentCar.y; 
+    cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
+
+    console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
     drawShapes();
 }
@@ -427,6 +434,7 @@ function checkForOverLap () {
     cars[currentCarIndex].carTop = currentCar.y; 
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
    
+    
     //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
      //compare current car to others.
     //console.log(currentCar);//logs the details of the current car
@@ -447,10 +455,11 @@ function checkForOverLap () {
             currentCar.carTop < otherCars.carBottom;
 
      if (overlapX && overlapY) {
-        console.log("Overlap detected with car colour " + cars[i].color +" at cars index:", i); 
+        console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
         //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
-        //BUG overlap of single pixel can stop movement, need to put in a buffer
-
+        console.log("currentCar" , currentCar);
+        //BUG! overlap of single pixel can stop movement, need to put in a buffer
+        
         snapTo();
         //if overlap is detected
         //prevent further movement
