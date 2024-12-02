@@ -4,7 +4,7 @@ let canvas = document.getElementById("canvas");
 // .getContent Returns a static collection of nodes representing the flow's source content.
 let context = canvas.getContext("2d");
 //to set it to a px size you don't need speech marks or 'px' at the end.
-    
+
 let canvasOffset = canvas.getBoundingClientRect();
 
 canvas.width = 900;
@@ -41,14 +41,14 @@ let cellCoords = {
     "A4": { x: 450, y: 0 },
     "A5": { x: 600, y: 0 },
     "A6": { x: 750, y: 0 },
-    
+
     "B1": { x: 0, y: 150 },
     "B2": { x: 150, y: 150 },
     "B3": { x: 300, y: 150 },
     "B4": { x: 450, y: 150 },
     "B5": { x: 600, y: 150 },
     "B6": { x: 750, y: 150 },
-    
+
     "C1": { x: 0, y: 300 },
     "C2": { x: 150, y: 300 },
     "C3": { x: 300, y: 300 },
@@ -57,11 +57,11 @@ let cellCoords = {
     "C6": { x: 750, y: 300 },
 
     "D1": { x: 0, y: 450 },
-    "D2": { x: 150, y: 450},
-    "D3": { x: 300, y: 450},
-    "D4": { x: 450, y: 450},
-    "D5": { x: 600, y: 450},
-    "D6": { x: 750, y: 450},
+    "D2": { x: 150, y: 450 },
+    "D3": { x: 300, y: 450 },
+    "D4": { x: 450, y: 450 },
+    "D5": { x: 600, y: 450 },
+    "D6": { x: 750, y: 450 },
 
     "E1": { x: 0, y: 600 },
     "E2": { x: 150, y: 600 },
@@ -78,7 +78,6 @@ let cellCoords = {
     "F6": { x: 750, y: 750 },
 
 };
-
 
 // creates the vertical grid lines array
 let vertGridLines = [];
@@ -153,7 +152,7 @@ for (let row = 0; row < numRows; row++) {
             zoneName: `${String.fromCharCode(97 + row)}${col + 1}` // For example, "a1", "a2", ..., "b1", "b2", ...
         };
         //pushes the new object to the array
-        
+
     }
 }
 
@@ -171,13 +170,18 @@ canvas.onresize = function () { getOffset(); }
 //Draw shapes
 let cars = [];
 //x = leftEdge, y = bottomEdge, 
-cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom:150, color: 'green', orientation:'hrz'});
-cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom:300, color: 'red', orientation:'vrt'});
-cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 300, carRightEdge: 600, carTop: 600, carBottom:750, color: 'blue', orientation:'hrz'});
-cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom:450, color: 'orange', orientation:'hrz'});
-cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom:600, color: 'teal', orientation:'vrt'});
+cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz' });
+cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt' });
+cars.push({ x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz' });
+cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz' });
+cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt' });
+cars.push({ x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt' });
+cars.push({ x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt' });
+cars.push({ x: 0, y: 600, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750, color: 'purple', orientation: 'hrz' });
+cars.push({ x: 150, y: 750, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900, color: 'violet', orientation: 'hrz' });
+cars.push({ x: 600, y: 600, width: 150, height: 300, carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900, color: 'brown', orientation: 'vrt' });
 
-function drawCars () {
+function drawCars() {
     for (let car of cars) {
         context.fillStyle = car.color; //Sets the fillstyle e.g. colour
         context.fillRect(car.x, car.y, car.width, car.height) //the fillRect() method draws a "filled" rectangle.
@@ -187,57 +191,57 @@ drawCars();
 
 function getMousePosition(event) {
 
-    let x = event.clientX - canvasOffset.left -4; //minus 4 solved the slight offset issue from line width/border
-    let y = event.clientY - canvasOffset.top -4;
-    console.log("Coordinate x: " + x, "Coordinate y: " + y); 
-    checkCellRef(x,y)
+    let x = event.clientX - canvasOffset.left - 4; //minus 4 solved the slight offset issue from line width/border
+    let y = event.clientY - canvasOffset.top - 4;
+    console.log("Coordinate x: " + x, "Coordinate y: " + y);
+    checkCellRef(x, y)
 }
 
 canvas.addEventListener("mousedown", function (e) {
-    getMousePosition(e); 
+    getMousePosition(e);
     //run a check to see which cell the mouse is in 
-    
-}); 
 
-function checkCellRef (x,y) {
+});
+
+function checkCellRef(x, y) {
     let row;
     let column;
-    
+
     //column
-    if (x<150) {  
+    if (x < 150) {
         column = "A"
-    } 
-    else if (x<300) { 
+    }
+    else if (x < 300) {
         column = "B"
     }
-    else if (x<450) {  
+    else if (x < 450) {
         column = "C"
     }
-    else if (x<600) {  
+    else if (x < 600) {
         column = "D"
     }
-    else if (x<750) {
+    else if (x < 750) {
         column = "E"
-    } else if (x<900) {
+    } else if (x < 900) {
         column = "F"
     }
-    
+
     //Row
-        if (y<150) {  
+    if (y < 150) {
         row = "1"
-    } 
-    else if (y<300) { 
+    }
+    else if (y < 300) {
         row = "2"
     }
-    else if (y<450) {  
+    else if (y < 450) {
         row = "3"
     }
-    else if (y<600) {  
+    else if (y < 600) {
         row = "4"
     }
-    else if (y<750) {
+    else if (y < 750) {
         row = "5"
-    } else if (y<900) {
+    } else if (y < 900) {
         row = "6"
     }
 
@@ -254,18 +258,17 @@ function mouseDown(e) {
     startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
     startY = parseInt(e.clientY - offsetY); //clientY property returns the vertical client coordinate of the mouse pointer
     //console.log("Y axis "+ startY, "\nX axis " + startX);
-    
+
     for (let i = 0; i < cars.length; i++) {
         let car = cars[i];
-        if (isMouseInShape(startX, startY, car)) {        
-                // Regular dragging behavior
-                currentCarIndex = i;
-                isDragging = true;
-                return;
+        if (isMouseInShape(startX, startY, car)) {
+            // Regular dragging behavior
+            currentCarIndex = i;
+            isDragging = true;
+            return;
         }
     }
 }
-
 
 //find the middle point of the moving object
 function findMiddlePoint() {
@@ -276,7 +279,6 @@ function findMiddlePoint() {
     //console.log("left hand side edge x co-ordinate = " + cars[currentCarIndex].x);
     //console.log("left hand side edge y co-ordinate = " + cars[currentCarIndex].y);
 }
-
 
 // mouse up event
 function mouseUp(e) {
@@ -299,13 +301,12 @@ function mouseOut(e) {
     }
 }
 
-
 //need to add object collisions to mouseMove
 function mouseMove(e) {
     if (!isDragging) {
         return;
     } else {
-        
+
 
         //console.log("move with dragging");
         e.preventDefault();
@@ -319,7 +320,7 @@ function mouseMove(e) {
         currentCar = cars[currentCarIndex];
         //console.log(currentShape);
         //updates the value of the shapes x and y co-ordinates
-        
+
         if (currentCar.orientation == "hrz") {
             //console.log(currentCar.orientation);
             currentCar.x += mouseMoveDistanceX;
@@ -332,18 +333,18 @@ function mouseMove(e) {
         //put in an exception for the escape car
         if (currentCar.mainCar == true) {
             console.log("This is the main car")
-        } 
-        
+        }
+
         //BUG! if the cars are moved too fast it can cause them to glitch through others
 
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
         if (currentCar.carRightEdge > 900) {
             console.log("out of bounds");
-            if(currentCar.width == 300) { //if statement here catches different sized cars (2 square and 3 square)
-            currentCar.x = 600;
+            if (currentCar.width == 300) { //if statement here catches different sized cars (2 square and 3 square)
+                currentCar.x = 600;
             } else {
-            currentCar.x = 450;
+                currentCar.x = 450;
             }
 
         }
@@ -352,14 +353,14 @@ function mouseMove(e) {
             currentCar.x = 0;
         }
 
-         //prevents car leaving grid on y axis
-        if (currentCar.carBottom > 900) { 
-            console.log("out of bounds");
-            if(currentCar.height == 300) { //if statement here catches different sized cars (2 square and 3 square)
+        //prevents car leaving grid on y axis
+        if (currentCar.carBottom > 900) {
+            //console.log("out of bounds");
+            if (currentCar.height == 300) { //if statement here catches different sized cars (2 square and 3 square)
                 currentCar.y = 600;
             } else {
                 currentCar.y = 450;
-            } 
+            }
         }
         if (currentCar.y < 1) {
             console.log("out of bounds");
@@ -374,8 +375,8 @@ function mouseMove(e) {
         //console.log("square is moving")
         startX = mouseX;
         startY = mouseY;
-        }
     }
+}
 
 // listens for the mousedown event on the canvas
 canvas.onmousedown = mouseDown;
@@ -412,8 +413,6 @@ function snapTo() {
     //half of 150 is 75, therefore if the modulus number is below 75 then round down. If over 75 round up.
     //clips the hrz cars
 
-    //
-    
     let modulusHrzRemainder = leftEdgeLocation % 150
     //console.log(modulusHrzRemainder);
     if (modulusHrzRemainder < 75) {
@@ -421,7 +420,7 @@ function snapTo() {
         cars[currentCarIndex].x = leftEdgeLocation - modulusHrzRemainder;
     } else {
         //roundDown
-        cars[currentCarIndex].x = ((150-modulusHrzRemainder) + leftEdgeLocation)
+        cars[currentCarIndex].x = ((150 - modulusHrzRemainder) + leftEdgeLocation)
     }
 
     //clips the vert cars
@@ -432,32 +431,29 @@ function snapTo() {
         cars[currentCarIndex].y = topEdgeLocation - modulusVrtRemainder;
     } else {
         //roundDown
-        cars[currentCarIndex].y = ((150-modulusVrtRemainder) + topEdgeLocation)
+        cars[currentCarIndex].y = ((150 - modulusVrtRemainder) + topEdgeLocation)
     }
-
 
     //update car location once they have been snapped to grid, this stops cars getting stuck on each other by tiny margins
     cars[currentCarIndex].carLeftEdge = currentCar.x;
-    cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
-    cars[currentCarIndex].carTop = currentCar.y; 
+    cars[currentCarIndex].carRightEdge = currentCar.x + currentCar.width;
+    cars[currentCarIndex].carTop = currentCar.y;
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
 
-
-    console.log(currentCar);
+    //console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
     drawShapes();
 }
 
-
-function checkForOverLap () {
+function checkForOverLap() {
     //prevent car overlapping existing car
     //need to get all of the cars edge co-ordinates
-    
+
     cars[currentCarIndex].carLeftEdge = currentCar.x;
-    cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
-    cars[currentCarIndex].carTop = currentCar.y; 
+    cars[currentCarIndex].carRightEdge = currentCar.x + currentCar.width;
+    cars[currentCarIndex].carTop = currentCar.y;
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
-   
+
     //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
     //compare current car to others.
     //console.log(currentCar);//logs the details of the current car
@@ -477,32 +473,30 @@ function checkForOverLap () {
             currentCar.carBottom > otherCars.carTop &&
             currentCar.carTop < otherCars.carBottom;
 
-     if (overlapX && overlapY) {
-        console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
-        //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
-        console.log("currentCar" , currentCar);
-        //BUG! overlap of single pixel can stop movement, need to put in a buffer
-        
-        snapTo();
-        //if overlap is detected
-        //prevent further movement
-        //call snap to func
+        if (overlapX && overlapY) {
+            //console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
+            //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
+            //console.log("currentCar" , currentCar);
 
+            //BUGS! if pieces are moved too fast they can overlap. 
+            //some sort of speed limiter
+            //move counter?
+            //occasionally some of the cars seem not to get snapped to squares
+            //easy way to make new levels? store car layout data as a JSON? 
+            //use square codes e.g blue C3, C4 to show where the cars get placed? 
+            //win conditions, win message, confetti 
 
-
-        }      
+            snapTo();
+            //call snap to func if overlap is detected
+            //this prevents further movement
+        }
 
         //console.log(car.carLeftEdge)
     }
 
     //y axis increases as it goes down
     //x axis increases as it goes right
-
-    
-
 }
-
-
 
 async function drawShapes() {
 
@@ -517,12 +511,12 @@ async function drawShapes() {
         context.save(); // Save the current state, required
         context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
         context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
-    
-            // Draw the shape with color (fallback)
-            context.fillStyle = car.color;
-            context.fillRect(0, 0, car.width, car.height);
-           
-            //this section deals primarily with the rotate button:   
+
+        // Draw the shape with color (fallback)
+        context.fillStyle = car.color;
+        context.fillRect(0, 0, car.width, car.height);
+
+        //this section deals primarily with the rotate button:   
         context.restore(); // Restore the previous state     
     }
 };
