@@ -171,8 +171,9 @@ canvas.onresize = function () { getOffset(); }
 let cars = [];
 //x = leftEdge, y = bottomEdge, 
 cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 150, carBottom:300, color: 'green', orientation:'hrz'});
-cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 300, carBottom:300, color: 'red', orientation:'vrt'});
+cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 300, carBottom:600, color: 'red', orientation:'vrt'});
 cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 300, carRightEdge: 600, carTop: 600, carBottom:750, color: 'blue', orientation:'hrz'});
+cars.push({ x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom:450, color: 'yellow', orientation:'hrz'});
 
 function drawCars () {
     for (let car of cars) {
@@ -186,7 +187,7 @@ function getMousePosition(event) {
 
     let x = event.clientX - canvasOffset.left -4; //minus 4 solved the slight offset issue from line width/border
     let y = event.clientY - canvasOffset.top -4;
-    //console.log("Coordinate x: " + x, "Coordinate y: " + y); 
+    console.log("Coordinate x: " + x, "Coordinate y: " + y); 
     checkCellRef(x,y)
 }
 
