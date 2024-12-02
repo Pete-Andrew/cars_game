@@ -88,6 +88,7 @@ vertGridLines.push({ x: 450, y: 0, width: 4, height: canvasHeight, color: 'blacK
 vertGridLines.push({ x: 600, y: 0, width: 4, height: canvasHeight, color: 'blacK' });
 vertGridLines.push({ x: 750, y: 0, width: 4, height: canvasHeight, color: 'blacK' });
 
+
 // draws the vert grid
 function drawVertGrid() {
     // context.clearRect(0,0, canvasWidth, canvasHeight);
@@ -170,10 +171,11 @@ canvas.onresize = function () { getOffset(); }
 //Draw shapes
 let cars = [];
 //x = leftEdge, y = bottomEdge, 
-cars.push({ x: 150, y: 150, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 150, carBottom:300, color: 'green', orientation:'hrz'});
-cars.push({ x: 450, y: 300, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 300, carBottom:600, color: 'red', orientation:'vrt'});
+cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom:150, color: 'green', orientation:'hrz'});
+cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom:300, color: 'red', orientation:'vrt'});
 cars.push({ x: 300, y: 600, width: 300, height: 150, carLeftEdge: 300, carRightEdge: 600, carTop: 600, carBottom:750, color: 'blue', orientation:'hrz'});
-cars.push({ x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom:450, color: 'yellow', orientation:'hrz'});
+cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom:450, color: 'orange', orientation:'hrz'});
+cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom:600, color: 'teal', orientation:'vrt'});
 
 function drawCars () {
     for (let car of cars) {
@@ -327,11 +329,23 @@ function mouseMove(e) {
             currentCar.y += mouseMoveDistanceY;
         }
 
+        //put in an exception for the escape car
+        if (currentCar.mainCar == true) {
+            console.log("This is the main car")
+        } 
+        
+        //BUG! if the cars are moved too fast it can cause them to glitch through others
+
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
-        if (currentCar.x > 600) {
+        if (currentCar.carRightEdge > 900) {
             console.log("out of bounds");
+            if(currentCar.width == 300) { //if statement here catches different sized cars (2 square and 3 square)
             currentCar.x = 600;
+            } else {
+            currentCar.x = 450;
+            }
+
         }
         if (currentCar.x < 1) {
             console.log("out of bounds");
@@ -339,9 +353,13 @@ function mouseMove(e) {
         }
 
          //prevents car leaving grid on y axis
-        if (currentCar.y > 600) {
+        if (currentCar.carBottom > 900) { 
             console.log("out of bounds");
-            currentCar.y = 600;
+            if(currentCar.height == 300) { //if statement here catches different sized cars (2 square and 3 square)
+                currentCar.y = 600;
+            } else {
+                currentCar.y = 450;
+            } 
         }
         if (currentCar.y < 1) {
             console.log("out of bounds");
@@ -393,6 +411,9 @@ function snapTo() {
     //leftEdgeLocation % 150
     //half of 150 is 75, therefore if the modulus number is below 75 then round down. If over 75 round up.
     //clips the hrz cars
+
+    //
+    
     let modulusHrzRemainder = leftEdgeLocation % 150
     //console.log(modulusHrzRemainder);
     if (modulusHrzRemainder < 75) {
@@ -414,11 +435,13 @@ function snapTo() {
         cars[currentCarIndex].y = ((150-modulusVrtRemainder) + topEdgeLocation)
     }
 
+
     //update car location once they have been snapped to grid, this stops cars getting stuck on each other by tiny margins
     cars[currentCarIndex].carLeftEdge = currentCar.x;
     cars[currentCarIndex].carRightEdge =  currentCar.x + currentCar.width;
     cars[currentCarIndex].carTop = currentCar.y; 
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
+
 
     console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
@@ -435,9 +458,8 @@ function checkForOverLap () {
     cars[currentCarIndex].carTop = currentCar.y; 
     cars[currentCarIndex].carBottom = currentCar.y + currentCar.height;
    
-    
     //console.log("Left edge " + cars[currentCarIndex].carLeftEdge, "right edge " + cars[currentCarIndex].carRightEdge, "top edge " + cars[currentCarIndex].carTop, "bottom edge " + cars[currentCarIndex].carBottom);
-     //compare current car to others.
+    //compare current car to others.
     //console.log(currentCar);//logs the details of the current car
 
     for (let i = 0; i < cars.length; i++) {
