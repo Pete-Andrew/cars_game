@@ -120,9 +120,16 @@ function drawHorizGrid() {
         context.fillStyle = horizGridLine.color;
         context.fillRect(horizGridLine.x, horizGridLine.y, horizGridLine.width, horizGridLine.height)
         // console.log(horizGridLine)
+        drawExit();
+
     }
 }
 drawHorizGrid();
+
+function drawExit (){ //called when the grid is drawn
+    context.font = "50px Arial";
+    context.fillText(">>>    >>>",640, 400);
+}
 
 //for using an image rather than a js drawn grid ----------- NOT IN USE CURRENTLY ----------------
 function backgroundCanvasImg() {
@@ -297,8 +304,7 @@ function mouseUp(e) {
         e.preventDefault();
         findMiddlePoint();
         isDragging = false;
-        snapTo();
-        
+        snapTo();      
     }
 }
 
@@ -413,12 +419,7 @@ function isMouseInShape(x, y, car) {
 
 
 function snapTo() {
-
-    currentCarOldPositionX = currentCar.x;
-    // console.log("currentCar old position X", currentCarOldPositionX);
-    currentCarOldPositionY = currentCar.y;
-    //console.log("currentCar old position Y", currentCarOldPositionY);
-
+    
     let leftEdgeLocation = cars[currentCarIndex].x;
     let topEdgeLocation = cars[currentCarIndex].y;
     //get edge value, snap to the nearest multiple of 150
@@ -459,10 +460,7 @@ function snapTo() {
 
     //console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
-    currentCarNewPositionX = currentCar.x;
-    // console.log("currentCar new position X", currentCarNewPositionX);
-    currentCarNewPositionY = currentCar.y;
-    //console.log("currentCar new position Y", currentCarNewPositionY);
+    console.log(currentCar);
         
     drawShapes();
     //isOverlapping = false; //resets the is overlapping once the shape has been snapped to grid
@@ -472,9 +470,17 @@ function snapTo() {
 }
 
 function numberOfMovesFunc(){
-    console.log("currentCarOldPositionY", currentCarOldPositionY);
-    //console.log("curretnCarOldPositionX", currentCarOldPositionX);
+    
+    if(isDragging) { //prevents numberOfMoves increasing if the car is being dragged against another
+        return;
+    } else {
+    //Need to check if the car has left the cell it has started in
+    //
+    console.log(currentCar);
+    numberOfMoves++
+    console.log("number of moves",numberOfMoves)
     }
+}
 
 function checkForOverLap() {
     //prevent car overlapping existing car
@@ -508,7 +514,7 @@ function checkForOverLap() {
             
             isOverlapping = true;
             //console.log("isOverlapping =", isOverlapping)
-            console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
+            //console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
             //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
             //console.log("currentCar" , currentCar);
 
@@ -546,6 +552,9 @@ async function drawShapes() {
 
     for (let car of cars) {
 
+        // context.font = "50px Arial";
+        // context.fillText("Hello World",10,80);
+
         context.save(); // Save the current state, required
         context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
         context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
@@ -562,7 +571,7 @@ async function drawShapes() {
 function winConditions() {
     if (currentCar.carLeftEdge > 598 && currentCar.carTop == 300 && currentCar.carBottom == 450) {
         console.log("whoop!")
-        alert("Rah Gumba! /n You have freed the beast!")
+        alert("Rah Gumba! \nYou have freed the beast!")
         //if the car has the attribute 'maincar' is in cells C5 and C6 
         //win condition = true 
 
