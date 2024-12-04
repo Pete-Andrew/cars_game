@@ -1,14 +1,13 @@
 //ctrl+shift+L allows you to select all similar values, use with caution!
 
-let canvas = document.getElementById("canvas");
+let canvas = document.getElementById("gameCanvas");
 // .getContent Returns a static collection of nodes representing the flow's source content.
 let context = canvas.getContext("2d");
 //to set it to a px size you don't need speech marks or 'px' at the end.
-
-let canvasOffset = canvas.getBoundingClientRect();
-
 canvas.width = 900;
 canvas.height = 900;
+
+let canvasOffset = canvas.getBoundingClientRect();
 
 //stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
@@ -32,8 +31,16 @@ let zoneStartY;
 let gridRef;
 let isDragging;
 let currentCarIndex;
+let isOverlapping = false;
+let currentCarOldPositionY
+let currentCarOldPositionX
+let currentCarNewPositionY
+let currentCarNewPositionX
 
 
+let numberOfMoves = 0;
+
+//co-ordinates for cells e.g. A1, B2 etc. 
 let cellCoords = {
     "A1": { x: 0, y: 0 },
     "A2": { x: 150, y: 0 },
@@ -125,8 +132,8 @@ function backgroundCanvasImg() {
         context.drawImage(base_image, 0, 0);
     }
 } // This function is currently never called!! 
-
 // backgroundCanvasImg(); 
+
 // set co-ordinates for the grid squares
 let zones = [];
 
@@ -160,6 +167,8 @@ for (let row = 0; row < numRows; row++) {
 function getOffset() {
     offsetX = canvasOffset.left;
     offsetY = canvasOffset.top;
+    //console.log("canvas OffsetX ", offsetX)
+    //console.log("canvas offsetY ", offsetY)
 }
 getOffset();
 
@@ -190,18 +199,18 @@ function drawCars() {
 drawCars();
 
 function getMousePosition(event) {
+    const rect = canvas.getBoundingClientRect(); // Get the canvas position
+    const x = event.clientX - rect.left + window.scrollX; // Adjust for horizontal scroll
+    const y = event.clientY - rect.top + window.scrollY;  // Adjust for vertical scroll
 
-    let x = event.clientX - canvasOffset.left - 4; //minus 4 solved the slight offset issue from line width/border
-    let y = event.clientY - canvasOffset.top - 4;
-    console.log("Coordinate x: " + x, "Coordinate y: " + y);
-    checkCellRef(x, y)
+    //console.log("Rect:", rect);
+    //console.log("ScrollX:", window.scrollX, "ScrollY:", window.scrollY);
+
+    //console.log("Coordinate x: " + x, "Coordinate y: " + y);
+    checkCellRef(x, y);
 }
 
-canvas.addEventListener("mousedown", function (e) {
-    getMousePosition(e);
-    //run a check to see which cell the mouse is in 
-
-});
+canvas.addEventListener("mousedown", getMousePosition);
 
 function checkCellRef(x, y) {
     let row;
@@ -255,8 +264,8 @@ function checkCellRef(x, y) {
 function mouseDown(e) {
     e.preventDefault();
 
-    startX = parseInt(e.clientX - offsetX); //clientX property returns the horizontal client coordinate of the mouse pointer
-    startY = parseInt(e.clientY - offsetY); //clientY property returns the vertical client coordinate of the mouse pointer
+    startX = parseInt(e.clientX - offsetX + window.scrollX); //clientX property returns the horizontal client coordinate of the mouse pointer
+    startY = parseInt(e.clientY - offsetY + window.scrollY); //clientY property returns the vertical client coordinate of the mouse pointer
     //console.log("Y axis "+ startY, "\nX axis " + startX);
 
     for (let i = 0; i < cars.length; i++) {
@@ -289,6 +298,7 @@ function mouseUp(e) {
         findMiddlePoint();
         isDragging = false;
         snapTo();
+        
     }
 }
 
@@ -310,8 +320,8 @@ function mouseMove(e) {
 
         //console.log("move with dragging");
         e.preventDefault();
-        let mouseX = parseInt(e.clientX - offsetX);
-        let mouseY = parseInt(e.clientY - offsetY);
+        let mouseX = parseInt(e.clientX - offsetX + window.scrollX);
+        let mouseY = parseInt(e.clientY - offsetY + window.scrollY);
 
         let mouseMoveDistanceX = mouseX - startX;
         let mouseMoveDistanceY = mouseY - startY;
@@ -332,7 +342,7 @@ function mouseMove(e) {
 
         //put in an exception for the escape car
         if (currentCar.mainCar == true) {
-            console.log("This is the main car")
+            //console.log("This is the main car")
         }
 
         //BUG! if the cars are moved too fast it can cause them to glitch through others
@@ -340,7 +350,7 @@ function mouseMove(e) {
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
         if (currentCar.carRightEdge > 900) {
-            console.log("out of bounds");
+            //console.log("out of bounds");
             if (currentCar.width == 300) { //if statement here catches different sized cars (2 square and 3 square)
                 currentCar.x = 600;
             } else {
@@ -349,7 +359,7 @@ function mouseMove(e) {
 
         }
         if (currentCar.x < 1) {
-            console.log("out of bounds");
+            //console.log("out of bounds");
             currentCar.x = 0;
         }
 
@@ -363,7 +373,7 @@ function mouseMove(e) {
             }
         }
         if (currentCar.y < 1) {
-            console.log("out of bounds");
+            //console.log("out of bounds");
             currentCar.y = 0;
         }
 
@@ -400,7 +410,14 @@ function isMouseInShape(x, y, car) {
     }
 }
 
+
+
 function snapTo() {
+
+    currentCarOldPositionX = currentCar.x;
+    // console.log("currentCar old position X", currentCarOldPositionX);
+    currentCarOldPositionY = currentCar.y;
+    //console.log("currentCar old position Y", currentCarOldPositionY);
 
     let leftEdgeLocation = cars[currentCarIndex].x;
     let topEdgeLocation = cars[currentCarIndex].y;
@@ -442,8 +459,22 @@ function snapTo() {
 
     //console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
+    currentCarNewPositionX = currentCar.x;
+    // console.log("currentCar new position X", currentCarNewPositionX);
+    currentCarNewPositionY = currentCar.y;
+    //console.log("currentCar new position Y", currentCarNewPositionY);
+        
     drawShapes();
+    //isOverlapping = false; //resets the is overlapping once the shape has been snapped to grid
+    numberOfMovesFunc();
+       
+    winConditions(); //called after the draw shapes
 }
+
+function numberOfMovesFunc(){
+    console.log("currentCarOldPositionY", currentCarOldPositionY);
+    //console.log("curretnCarOldPositionX", currentCarOldPositionX);
+    }
 
 function checkForOverLap() {
     //prevent car overlapping existing car
@@ -474,7 +505,10 @@ function checkForOverLap() {
             currentCar.carTop < otherCars.carBottom;
 
         if (overlapX && overlapY) {
-            //console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
+            
+            isOverlapping = true;
+            //console.log("isOverlapping =", isOverlapping)
+            console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
             //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
             //console.log("currentCar" , currentCar);
 
@@ -489,6 +523,10 @@ function checkForOverLap() {
             snapTo();
             //call snap to func if overlap is detected
             //this prevents further movement
+        } else {
+            isOverlapping = false;
+            //console.log("isOverlapping =", isOverlapping)
+
         }
 
         //console.log(car.carLeftEdge)
@@ -520,6 +558,17 @@ async function drawShapes() {
         context.restore(); // Restore the previous state     
     }
 };
+
+function winConditions() {
+    if (currentCar.carLeftEdge > 598 && currentCar.carTop == 300 && currentCar.carBottom == 450) {
+        console.log("whoop!")
+        alert("Rah Gumba! /n You have freed the beast!")
+        //if the car has the attribute 'maincar' is in cells C5 and C6 
+        //win condition = true 
+
+    }
+}
+
 
 
 //.forEach
