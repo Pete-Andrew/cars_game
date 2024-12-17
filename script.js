@@ -188,16 +188,16 @@ canvas.onresize = function () { getOffset(); }
 //Draw shapes
 let cars = [];
 //x = leftEdge, y = bottomEdge, 
-cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz' });
-cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt' });
-cars.push({ x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz' });
-cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz' });
-cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt' });
-cars.push({ x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt' });
-cars.push({ x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt' });
-cars.push({ x: 0, y: 600, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750, color: 'purple', orientation: 'hrz' });
-cars.push({ x: 150, y: 750, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900, color: 'violet', orientation: 'hrz' });
-cars.push({ x: 600, y: 600, width: 150, height: 300, carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900, color: 'brown', orientation: 'vrt' });
+cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz', hasMoved: false });
+cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt', hasMoved: false });
+cars.push({ x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz', hasMoved: false });
+cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz', hasMoved: false });
+cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt', hasMoved: false });
+cars.push({ x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt', hasMoved: false });
+cars.push({ x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt', hasMoved: false });
+cars.push({ x: 0, y: 600, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750, color: 'purple', orientation: 'hrz', hasMoved: false });
+cars.push({ x: 150, y: 750, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900, color: 'violet', orientation: 'hrz', hasMoved: false });
+cars.push({ x: 600, y: 600, width: 150, height: 300, carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900, color: 'brown', orientation: 'vrt', hasMoved: false });
 
 function drawCars() {
     for (let car of cars) {
@@ -470,33 +470,50 @@ function snapTo() {
     winConditions(); //called after the draw shapes
 }
 
-function numberOfMovesFunc(){
-    
-    if(isDragging) { //prevents numberOfMoves increasing if the car is being dragged against another
+function numberOfMovesFunc() {
+
+    if (isDragging) { //prevents numberOfMoves increasing if the car is being dragged against another
         return;
     } else {
-    
-    //Need to check if the car has left the cell it has started in
-    const car = cars[currentCarIndex];
 
-    if (!car.previousPosition) {
-        car.previousPosition = { carLeftEdge: car.carLeftEdge, carRightEdge: car.carRightEdge, carBottom: car.carBottom, carTop: car.carTop};
+        //this is declared elsewhere in the code but can be declared again here as a reminder.
+        currentCar = cars[currentCarIndex];
+
+        //if the car has never moved then set previousPosition to current. 
+        if (currentCar.hasMoved == false) {
+            console.log("This car has never previously moved");
+            currentCar.hasMoved = true;
+        }
+
+        //if no previous position exists, this should create it. BUT this code only runs once an object has been moved
+        //BUG
+        if (!currentCar.previousPosition) {
+            currentCar.previousPosition = {
+                carLeftEdge: currentCar.carLeftEdge,
+                carRightEdge: currentCar.carRightEdge,
+                carBottom: currentCar.carBottom,
+                carTop: currentCar.carTop
+            };
+        }
+
+        //compares the currentCar location with the current cars's previous location.
+        if (currentCar.carLeftEdge !== currentCar.previousPosition.carLeftEdge
+            || currentCar.carRightEdge !== currentCar.previousPosition.carRightEdge
+            || currentCar.carBottom !== currentCar.previousPosition.carBottom
+            || currentCar.carTop !== currentCar.previousPosition.carTop
+        ) {
+            numberOfMoves++; // Increment move counter
+            console.log("Car has moved!");
+            console.log("Number of moves:", numberOfMoves);
+
+            // Update the car's previous position
+            currentCar.previousPosition = { carLeftEdge: currentCar.carLeftEdge, carRightEdge: currentCar.carRightEdge, carBottom: currentCar.carBottom, carTop: currentCar.carTop };
+        } else {
+            console.log("Car has not moved. Move counter unchanged.");
+            //error, on the first move of any car, the car's previous location is not defined. 
+            //need to initialise the state
+        }
     }
-
-    if (car.carLeftEdge !== car.previousPosition.carLeftEdge || car.carRightEdge !== car.previousPosition.carRightEdge 
-        || car.carBottom !== car.previousPosition.carBottom || car.carTop !== car.previousPosition.carTop
-    ) {
-        numberOfMoves++; // Increment move counter
-        console.log("Car has moved!");
-        console.log("Number of moves:", numberOfMoves);
-
-        // Update the car's previous position
-        car.previousPosition = { carLeftEdge: car.carLeftEdge, carRightEdge: car.carRightEdge, carBottom: car.carBottom, carTop: car.carTop};
-    } else {
-        console.log("Car has not moved. Move counter unchanged.");
-        //error, on the first move the car's previous location is not defined. 
-    }
-}
 }
 
 function checkForOverLap() {
