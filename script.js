@@ -95,6 +95,7 @@ vertGridLines.push({ x: 600, y: 0, width: 4, height: canvasHeight, color: 'blacK
 vertGridLines.push({ x: 750, y: 0, width: 4, height: canvasHeight, color: 'blacK' });
 
 
+
 // draws the vert grid
 function drawVertGrid() {
     // context.clearRect(0,0, canvasWidth, canvasHeight);
@@ -102,6 +103,7 @@ function drawVertGrid() {
         context.fillStyle = vertGridLine.color;
         context.fillRect(vertGridLine.x, vertGridLine.y, vertGridLine.width, vertGridLine.height)
         // console.log(vertGridLine)
+        
     }
 }
 drawVertGrid();
@@ -121,7 +123,7 @@ function drawHorizGrid() {
         context.fillRect(horizGridLine.x, horizGridLine.y, horizGridLine.width, horizGridLine.height)
         // console.log(horizGridLine)
         drawExit();
-
+        
     }
 }
 drawHorizGrid();
@@ -134,12 +136,12 @@ function drawExit (){ //called when the grid is drawn
 //for using an image rather than a js drawn grid ----------- NOT IN USE CURRENTLY ----------------
 function backgroundCanvasImg() {
     base_image = new Image();
-    base_image.src = 'img/fiveByFiveGrid.gif'
+    base_image.src = 'img/Ai_Funny.jpg'
     base_image.onload = function () {
         context.drawImage(base_image, 0, 0);
     }
 } // This function is currently never called!! 
-// backgroundCanvasImg(); 
+//backgroundCanvasImg(); 
 
 // set co-ordinates for the grid squares
 let zones = [];
@@ -416,8 +418,6 @@ function isMouseInShape(x, y, car) {
     }
 }
 
-
-
 function snapTo() {
     
     let leftEdgeLocation = cars[currentCarIndex].x;
@@ -460,10 +460,11 @@ function snapTo() {
 
     //console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
-    console.log(currentCar);
+    //console.log(currentCar);
         
     drawShapes();
     //isOverlapping = false; //resets the is overlapping once the shape has been snapped to grid
+    
     numberOfMovesFunc();
        
     winConditions(); //called after the draw shapes
@@ -474,12 +475,28 @@ function numberOfMovesFunc(){
     if(isDragging) { //prevents numberOfMoves increasing if the car is being dragged against another
         return;
     } else {
+    
     //Need to check if the car has left the cell it has started in
-    //
-    console.log(currentCar);
-    numberOfMoves++
-    console.log("number of moves",numberOfMoves)
+    const car = cars[currentCarIndex];
+
+    if (!car.previousPosition) {
+        car.previousPosition = { carLeftEdge: car.carLeftEdge, carRightEdge: car.carRightEdge, carBottom: car.carBottom, carTop: car.carTop};
     }
+
+    if (car.carLeftEdge !== car.previousPosition.carLeftEdge || car.carRightEdge !== car.previousPosition.carRightEdge 
+        || car.carBottom !== car.previousPosition.carBottom || car.carTop !== car.previousPosition.carTop
+    ) {
+        numberOfMoves++; // Increment move counter
+        console.log("Car has moved!");
+        console.log("Number of moves:", numberOfMoves);
+
+        // Update the car's previous position
+        car.previousPosition = { carLeftEdge: car.carLeftEdge, carRightEdge: car.carRightEdge, carBottom: car.carBottom, carTop: car.carTop};
+    } else {
+        console.log("Car has not moved. Move counter unchanged.");
+        //error, on the first move the car's previous location is not defined. 
+    }
+}
 }
 
 function checkForOverLap() {
@@ -547,6 +564,7 @@ async function drawShapes() {
     //console.log(tileName);
 
     context.clearRect(0, 0, canvasWidth, canvasHeight);
+    
     drawHorizGrid();
     drawVertGrid();
 
@@ -574,7 +592,6 @@ function winConditions() {
         alert("Rah Gumba! \nYou have freed the beast!")
         //if the car has the attribute 'maincar' is in cells C5 and C6 
         //win condition = true 
-
     }
 }
 
