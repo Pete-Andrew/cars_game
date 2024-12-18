@@ -1,13 +1,20 @@
 //ctrl+shift+L allows you to select all similar values, use with caution!
+//import levelData allows the carLevels.js page to be seen by this one.
+import levelData from './carLevels.js'
 
 let canvas = document.getElementById("gameCanvas");
 // .getContent Returns a static collection of nodes representing the flow's source content.
 let context = canvas.getContext("2d");
+const counterElement = document.getElementById("counter");
+
+
+
 //to set it to a px size you don't need speech marks or 'px' at the end.
 canvas.width = 900;
 canvas.height = 900;
 
 let canvasOffset = canvas.getBoundingClientRect();
+
 
 //stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
@@ -20,6 +27,7 @@ let canvasHeight = canvas.height;
 //console.log("canvas height = ", canvasHeight);
 
 let currentCar;
+let currentCarPosition;
 let startX;
 let startY;
 //holds values that apply when the page is scaled (?)
@@ -36,9 +44,10 @@ let currentCarOldPositionY
 let currentCarOldPositionX
 let currentCarNewPositionY
 let currentCarNewPositionX
-
+let level = 1;
 
 let numberOfMoves = 0;
+counterElement.textContent = numberOfMoves;
 
 //co-ordinates for cells e.g. A1, B2 etc. 
 let cellCoords = {
@@ -186,18 +195,27 @@ window.onresize = function () { getOffset(); }
 canvas.onresize = function () { getOffset(); }
 
 //Draw shapes
+
 let cars = [];
+
+//using the loadCars function allows the code for the car locations to be stored on the 'carLevels.js' page
+function loadCars(level) {
+    cars = levelData[level] || [];
+}
+
 //x = leftEdge, y = bottomEdge, 
-cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz', hasMoved: false });
-cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt', hasMoved: false });
-cars.push({ x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz', hasMoved: false });
-cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz', hasMoved: false });
-cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt', hasMoved: false });
-cars.push({ x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt', hasMoved: false });
-cars.push({ x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt', hasMoved: false });
-cars.push({ x: 0, y: 600, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750, color: 'purple', orientation: 'hrz', hasMoved: false });
-cars.push({ x: 150, y: 750, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900, color: 'violet', orientation: 'hrz', hasMoved: false });
-cars.push({ x: 600, y: 600, width: 150, height: 300, carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900, color: 'brown', orientation: 'vrt', hasMoved: false });
+// cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz', hasMoved: false, initialPosition: {carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150} });
+// cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt', hasMoved: false, initialPosition: {carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300} });
+// cars.push({ x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz', hasMoved: false, initialPosition: {carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450 } });
+// cars.push({ mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz', hasMoved: false, initialPosition: {carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450} });
+// cars.push({ x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600 } });
+// cars.push({ x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300} });
+// cars.push({ x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt', hasMoved: false, initialPosition: {carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600} });
+// cars.push({ x: 0, y: 600, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750, color: 'purple', orientation: 'hrz', hasMoved: false, initialPosition: { carLeftEdge: 0, carRightEdge: 450, carTop: 600, carBottom: 750 } });
+// cars.push({ x: 150, y: 750, width: 300, height: 150, carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900, color: 'violet', orientation: 'hrz', hasMoved: false, initialPosition: {carLeftEdge: 150, carRightEdge: 450, carTop: 750, carBottom: 900} });
+// cars.push({ x: 600, y: 600, width: 150, height: 300, carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900, color: 'brown', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 600, carRightEdge: 750, carTop: 600, carBottom: 900 } });
+
+loadCars(level);
 
 function drawCars() {
     for (let car of cars) {
@@ -206,6 +224,13 @@ function drawCars() {
     }
 }
 drawCars();
+
+
+//currentCar = cars[currentCarIndex];
+
+// let carInitialLocation = {
+//     cars.carLeftEdge,
+// }
 
 function getMousePosition(event) {
     const rect = canvas.getBoundingClientRect(); // Get the canvas position
@@ -419,7 +444,7 @@ function isMouseInShape(x, y, car) {
 }
 
 function snapTo() {
-    
+
     let leftEdgeLocation = cars[currentCarIndex].x;
     let topEdgeLocation = cars[currentCarIndex].y;
     //get edge value, snap to the nearest multiple of 150
@@ -476,17 +501,29 @@ function numberOfMovesFunc() {
         return;
     } else {
 
-        //this is declared elsewhere in the code but can be declared again here as a reminder.
-        currentCar = cars[currentCarIndex];
-
         //if the car has never moved then set previousPosition to current. 
         if (currentCar.hasMoved == false) {
-            console.log("This car has never previously moved");
+            //console.log("This car has never previously moved");
+            //console.log("car.InitialPosition" , currentCar.initialPosition);
+
+            if (currentCar.carLeftEdge !== currentCar.initialPosition.carLeftEdge
+                || currentCar.carRightEdge !== currentCar.initialPosition.carRightEdge
+                || currentCar.carBottom !== currentCar.initialPosition.carBottom
+                || currentCar.carTop !== currentCar.initialPosition.carTop
+            ) {
+                numberOfMoves++;
+                console.log("Number of moves:", numberOfMoves);
+                counterElement.textContent = numberOfMoves
+             }
+            //this stops the function using the initial value of any car if they have already moved. 
             currentCar.hasMoved = true;
         }
 
-        //if no previous position exists, this should create it. BUT this code only runs once an object has been moved
-        //BUG
+        //if no previousPosition exists, this should create it.
+        //BUT this code only runs once an object has been moved. It is called by the snapTo function. 
+        //I have created and object within all the existing car objects that contains the initialPosition of each of them. 
+        //"currentCar.previousPosition" initializes a key value pair, an object inside the existing car object "previousPosition: {carLeftEdge: 450, .... etc.. }"
+        
         if (!currentCar.previousPosition) {
             currentCar.previousPosition = {
                 carLeftEdge: currentCar.carLeftEdge,
@@ -495,6 +532,9 @@ function numberOfMovesFunc() {
                 carTop: currentCar.carTop
             };
         }
+        
+        console.log(currentCar);
+        console.log(currentCar.previousPosition);
 
         //compares the currentCar location with the current cars's previous location.
         if (currentCar.carLeftEdge !== currentCar.previousPosition.carLeftEdge
@@ -505,6 +545,7 @@ function numberOfMovesFunc() {
             numberOfMoves++; // Increment move counter
             console.log("Car has moved!");
             console.log("Number of moves:", numberOfMoves);
+            counterElement.textContent = numberOfMoves
 
             // Update the car's previous position
             currentCar.previousPosition = { carLeftEdge: currentCar.carLeftEdge, carRightEdge: currentCar.carRightEdge, carBottom: currentCar.carBottom, carTop: currentCar.carTop };
@@ -566,12 +607,9 @@ function checkForOverLap() {
         } else {
             isOverlapping = false;
             //console.log("isOverlapping =", isOverlapping)
-
         }
-
         //console.log(car.carLeftEdge)
     }
-
     //y axis increases as it goes down
     //x axis increases as it goes right
 }

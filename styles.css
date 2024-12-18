@@ -14,3 +14,10 @@ canvas {
     margin-top: auto;
 }
 
+#counter {
+    text-align: center;
+}
+
+#level {
+    text-align: center;
+}

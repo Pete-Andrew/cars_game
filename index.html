@@ -11,13 +11,19 @@
     <h1>Escape!</h1>
     <p>How to play - get the orange car to the exit by moving the others out the way.</p>
     <p>cars can only move forwards and backwards.</p>
+    <p>Level <div id="level">1</div></p> </p>
+    <p>Move counter: <div id="counter">0</div></p>
     
     <div id="canvasDiv">
         <canvas id="gameCanvas"></canvas>
     </div>
 
     <p>Have fun!</p>
-    <script src="script.js"></script>
+    <!-- type="module" needs to be added to the script so that it can draw data from multiple JS pages -->
+    <script type="module" src="script.js"></script> 
+    
+    
+    
 </body>
 
 </html>
