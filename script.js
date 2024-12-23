@@ -6,15 +6,13 @@ let canvas = document.getElementById("gameCanvas");
 // .getContent Returns a static collection of nodes representing the flow's source content.
 let context = canvas.getContext("2d");
 const counterElement = document.getElementById("counter");
-
-
+const levelDisplay = document.getElementById("level");
 
 //to set it to a px size you don't need speech marks or 'px' at the end.
 canvas.width = 900;
 canvas.height = 900;
 
 let canvasOffset = canvas.getBoundingClientRect();
-
 
 //stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
@@ -27,14 +25,12 @@ let canvasHeight = canvas.height;
 //console.log("canvas height = ", canvasHeight);
 
 let currentCar;
-let currentCarPosition;
+
 let startX;
 let startY;
 //holds values that apply when the page is scaled (?)
 let offsetX;
 let offsetY;
-let zoneStartX;
-let zoneStartY;
 
 let gridRef;
 let isDragging;
@@ -44,10 +40,11 @@ let currentCarOldPositionY
 let currentCarOldPositionX
 let currentCarNewPositionY
 let currentCarNewPositionX
-let level = 1;
+let level = 3;
 
 let numberOfMoves = 0;
 counterElement.textContent = numberOfMoves;
+levelDisplay.textContent = level;
 
 //co-ordinates for cells e.g. A1, B2 etc. 
 let cellCoords = {
@@ -103,8 +100,6 @@ vertGridLines.push({ x: 450, y: 0, width: 4, height: canvasHeight, color: 'blacK
 vertGridLines.push({ x: 600, y: 0, width: 4, height: canvasHeight, color: 'blacK' });
 vertGridLines.push({ x: 750, y: 0, width: 4, height: canvasHeight, color: 'blacK' });
 
-
-
 // draws the vert grid
 function drawVertGrid() {
     // context.clearRect(0,0, canvasWidth, canvasHeight);
@@ -112,7 +107,7 @@ function drawVertGrid() {
         context.fillStyle = vertGridLine.color;
         context.fillRect(vertGridLine.x, vertGridLine.y, vertGridLine.width, vertGridLine.height)
         // console.log(vertGridLine)
-        
+
     }
 }
 drawVertGrid();
@@ -132,14 +127,14 @@ function drawHorizGrid() {
         context.fillRect(horizGridLine.x, horizGridLine.y, horizGridLine.width, horizGridLine.height)
         // console.log(horizGridLine)
         drawExit();
-        
+
     }
 }
 drawHorizGrid();
 
-function drawExit (){ //called when the grid is drawn
+function drawExit() { //called when the grid is drawn
     context.font = "50px Arial";
-    context.fillText(">>>    >>>",640, 400);
+    context.fillText(">>>    >>>", 640, 400);
 }
 
 //for using an image rather than a js drawn grid ----------- NOT IN USE CURRENTLY ----------------
@@ -177,7 +172,6 @@ for (let row = 0; row < numRows; row++) {
             zoneName: `${String.fromCharCode(97 + row)}${col + 1}` // For example, "a1", "a2", ..., "b1", "b2", ...
         };
         //pushes the new object to the array
-
     }
 }
 
@@ -221,16 +215,10 @@ function drawCars() {
     for (let car of cars) {
         context.fillStyle = car.color; //Sets the fillstyle e.g. colour
         context.fillRect(car.x, car.y, car.width, car.height) //the fillRect() method draws a "filled" rectangle.
+        
     }
 }
 drawCars();
-
-
-//currentCar = cars[currentCarIndex];
-
-// let carInitialLocation = {
-//     cars.carLeftEdge,
-// }
 
 function getMousePosition(event) {
     const rect = canvas.getBoundingClientRect(); // Get the canvas position
@@ -246,6 +234,7 @@ function getMousePosition(event) {
 
 canvas.addEventListener("mousedown", getMousePosition);
 
+//minimized as it is a long function
 function checkCellRef(x, y) {
     let row;
     let column;
@@ -293,7 +282,6 @@ function checkCellRef(x, y) {
 }
 
 //move the cars
-
 //onmousedown these functions are triggered
 function mouseDown(e) {
     e.preventDefault();
@@ -331,7 +319,7 @@ function mouseUp(e) {
         e.preventDefault();
         findMiddlePoint();
         isDragging = false;
-        snapTo();      
+        snapTo();
     }
 }
 
@@ -344,13 +332,10 @@ function mouseOut(e) {
     }
 }
 
-//need to add object collisions to mouseMove
 function mouseMove(e) {
     if (!isDragging) {
         return;
     } else {
-
-
         //console.log("move with dragging");
         e.preventDefault();
         let mouseX = parseInt(e.clientX - offsetX + window.scrollX);
@@ -379,7 +364,7 @@ function mouseMove(e) {
         }
 
         //BUG! if the cars are moved too fast it can cause them to glitch through others
-
+        
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
         if (currentCar.carRightEdge > 900) {
@@ -389,7 +374,6 @@ function mouseMove(e) {
             } else {
                 currentCar.x = 450;
             }
-
         }
         if (currentCar.x < 1) {
             //console.log("out of bounds");
@@ -412,7 +396,6 @@ function mouseMove(e) {
 
         //needs to be called live here
         checkForOverLap();
-
 
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
@@ -486,12 +469,12 @@ function snapTo() {
     //console.log(currentCar);
     //checkForOverLap(); needs to be called live in the mouseMove function 
     //console.log(currentCar);
-        
+
     drawShapes();
     //isOverlapping = false; //resets the is overlapping once the shape has been snapped to grid
-    
+
     numberOfMovesFunc();
-       
+
     winConditions(); //called after the draw shapes
 }
 
@@ -504,7 +487,7 @@ function numberOfMovesFunc() {
         //if the car has never moved then set previousPosition to current. 
         if (currentCar.hasMoved == false) {
             //console.log("This car has never previously moved");
-            //console.log("car.InitialPosition" , currentCar.initialPosition);
+            console.log("car.InitialPosition" , currentCar.initialPosition);
 
             if (currentCar.carLeftEdge !== currentCar.initialPosition.carLeftEdge
                 || currentCar.carRightEdge !== currentCar.initialPosition.carRightEdge
@@ -514,7 +497,7 @@ function numberOfMovesFunc() {
                 numberOfMoves++;
                 console.log("Number of moves:", numberOfMoves);
                 counterElement.textContent = numberOfMoves
-             }
+            }
             //this stops the function using the initial value of any car if they have already moved. 
             currentCar.hasMoved = true;
         }
@@ -522,8 +505,8 @@ function numberOfMovesFunc() {
         //if no previousPosition exists, this should create it.
         //BUT this code only runs once an object has been moved. It is called by the snapTo function. 
         //I have created and object within all the existing car objects that contains the initialPosition of each of them. 
-        //"currentCar.previousPosition" initializes a key value pair, an object inside the existing car object "previousPosition: {carLeftEdge: 450, .... etc.. }"
-        
+        //"currentCar.previousPosition" initializes a key value pair, which is an object inside the existing car object "previousPosition: {carLeftEdge: 450, .... etc.. }"
+
         if (!currentCar.previousPosition) {
             currentCar.previousPosition = {
                 carLeftEdge: currentCar.carLeftEdge,
@@ -532,9 +515,10 @@ function numberOfMovesFunc() {
                 carTop: currentCar.carTop
             };
         }
-        
-        console.log(currentCar);
-        console.log(currentCar.previousPosition);
+
+        console.log("currentCar", currentCar);
+        console.log("InitialPosition", currentCar.initialPosition);
+        console.log("previousPosition", currentCar.previousPosition);
 
         //compares the currentCar location with the current cars's previous location.
         if (currentCar.carLeftEdge !== currentCar.previousPosition.carLeftEdge
@@ -552,15 +536,17 @@ function numberOfMovesFunc() {
         } else {
             console.log("Car has not moved. Move counter unchanged.");
             //error, on the first move of any car, the car's previous location is not defined. 
-            //need to initialise the state
+            //to get round this I have created an 'initialPosition' array within each car object
         }
     }
 }
 
 function checkForOverLap() {
+    //could also be called collision detection 
     //prevent car overlapping existing car
     //need to get all of the cars edge co-ordinates
-
+    //BUG initialPosition is not being read somewhere
+    
     cars[currentCarIndex].carLeftEdge = currentCar.x;
     cars[currentCarIndex].carRightEdge = currentCar.x + currentCar.width;
     cars[currentCarIndex].carTop = currentCar.y;
@@ -586,7 +572,7 @@ function checkForOverLap() {
             currentCar.carTop < otherCars.carBottom;
 
         if (overlapX && overlapY) {
-            
+
             isOverlapping = true;
             //console.log("isOverlapping =", isOverlapping)
             //console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
@@ -595,10 +581,8 @@ function checkForOverLap() {
 
             //BUGS! if pieces are moved too fast they can overlap. 
             //some sort of speed limiter
-            //move counter?
             //occasionally some of the cars seem not to get snapped to squares
             //easy way to make new levels? store car layout data as a JSON? 
-            //use square codes e.g blue C3, C4 to show where the cars get placed? 
             //win conditions, win message, confetti 
 
             snapTo();
@@ -615,19 +599,14 @@ function checkForOverLap() {
 }
 
 async function drawShapes() {
-
     //console.log(tileName);
-
     context.clearRect(0, 0, canvasWidth, canvasHeight);
-    
     drawHorizGrid();
     drawVertGrid();
 
     for (let car of cars) {
-
         // context.font = "50px Arial";
         // context.fillText("Hello World",10,80);
-
         context.save(); // Save the current state, required
         context.translate(car.x + car.width / 2, car.y + car.height / 2); // Move to the center of the shape
         context.translate(-car.width / 2, -car.height / 2); // Move back to the top left corner of the shape
