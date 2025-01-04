@@ -229,12 +229,24 @@ function getMousePosition(event) {
     //console.log("ScrollX:", window.scrollX, "ScrollY:", window.scrollY);
 
     //console.log("Coordinate x: " + x, "Coordinate y: " + y);
-    checkCellRef(x, y);
+    //checkCellRef(x, y);
+    return { x, y };
 }
 
 canvas.addEventListener("mousedown", getMousePosition);
 
-//minimized as it is a long function
+//Mobile friendly touch screen code: 
+function getFingerPosition(touch) { //Not sure if this will work
+    const rect = canvas.getBoundingClientRect(); // Get the canvas position
+    const x = touch.clientX - rect.left + window.scrollX;
+    const y = touch.clientY - rect.top + window.scrollY;
+    alert("you have touched it!");
+    return { x, y };
+}
+
+canvas.addEventListener("touchstart", getFingerPosition);
+
+//minimized as it is a long function, no longer used
 function checkCellRef(x, y) {
     let row;
     let column;
