@@ -1,6 +1,7 @@
 body {
     margin: 0;
     padding: 0;
+    width: auto;
 }
 
 h1, p {

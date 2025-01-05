@@ -7,6 +7,8 @@ let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 const counterElement = document.getElementById("counter");
 const levelDisplay = document.getElementById("level");
+const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promted these to global variables
+let x, y;
 
 //to set it to a px size you don't need speech marks or 'px' at the end.
 canvas.width = 900;
@@ -197,6 +199,7 @@ function loadCars(level) {
     cars = levelData[level] || [];
 }
 
+//Cars array info have been moved to a separate JS sheet
 //x = leftEdge, y = bottomEdge, 
 // cars.push({ x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz', hasMoved: false, initialPosition: {carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150} });
 // cars.push({ x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt', hasMoved: false, initialPosition: {carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300} });
@@ -220,119 +223,58 @@ function drawCars() {
 }
 drawCars();
 
-function getMousePosition(event) {
-    const rect = canvas.getBoundingClientRect(); // Get the canvas position
-    const x = event.clientX - rect.left + window.scrollX; // Adjust for horizontal scroll
-    const y = event.clientY - rect.top + window.scrollY;  // Adjust for vertical scroll
+function getEventPosition(event) {
+
+    //const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promted these to global variables
+    //let x, y;
+    
+    //deals with input, whether finger or mouse
+    if (event.type.startsWith("touch")) {
+        const touch = event.touches[0] || event.changedTouches[0];
+        x = touch.clientX - rect.left + window.scrollX;
+        y = touch.clientY - rect.top + window.scrollY;
+        console.log("input is touch");
+    } else {
+        x = event.clientX - rect.left + window.scrollX;
+        y = event.clientY - rect.top + window.scrollY;
+    }
 
     //console.log("Rect:", rect);
     //console.log("ScrollX:", window.scrollX, "ScrollY:", window.scrollY);
-
     //console.log("Coordinate x: " + x, "Coordinate y: " + y);
     //checkCellRef(x, y);
     return { x, y };
 }
 
-canvas.addEventListener("mousedown", getMousePosition);
-
-//The next 3 functions handle touch screen interactions.
-//Mobile friendly touch screen code: 
-function getFingerPosition(touch) { //Not sure if this will work
-    const rect = canvas.getBoundingClientRect(); // Get the canvas position
-    const x = touch.clientX - rect.left + window.scrollX;
-    const y = touch.clientY - rect.top + window.scrollY;
-    //alert("you have touched it!");
-    return { x, y };
-}
-
-//canvas.addEventListener("touchstart", getFingerPosition);
-
-function handleTouchStart(event) {
-    event.preventDefault(); // Prevent scrolling
-    const touch = event.touches[0]; // Get the first touch point
-    const position = getFingerPosition(touch);
-    console.log("Finger Position:", position);
-    handleDragStart(position.x, position.y); // Use the normalized position
-}
-
-// Drag Start Handler (Shared Logic)
-function handleDragStart(x, y) {
-    startX = x;
-    startY = y;
-
-    for (let i = 0; i < cars.length; i++) {
-        let car = cars[i];
-        if (isMouseInShape(startX, startY, car)) {
-            currentCarIndex = i;
-            isDragging = true;
-            return;
-        }
-    }
-}
-
-// Add Event Listener
-canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
-
-//minimized as it is a long function, no longer used
-function checkCellRef(x, y) {
-    let row;
-    let column;
-
-    //column
-    if (x < 150) {
-        column = "A"
-    }
-    else if (x < 300) {
-        column = "B"
-    }
-    else if (x < 450) {
-        column = "C"
-    }
-    else if (x < 600) {
-        column = "D"
-    }
-    else if (x < 750) {
-        column = "E"
-    } else if (x < 900) {
-        column = "F"
-    }
-
-    //Row
-    if (y < 150) {
-        row = "1"
-    }
-    else if (y < 300) {
-        row = "2"
-    }
-    else if (y < 450) {
-        row = "3"
-    }
-    else if (y < 600) {
-        row = "4"
-    }
-    else if (y < 750) {
-        row = "5"
-    } else if (y < 900) {
-        row = "6"
-    }
-
-    let cellRef = String(column) + String(row);
-    //console.log(cellRef);
-}
+canvas.addEventListener("mouseDown", getEventPosition);
+canvas.addEventListener("touchstart", getEventPosition); // For touch input
 
 //move the cars
 //onmousedown these functions are triggered
-function mouseDown(e) {
+function handleDragStart(e) {
     e.preventDefault();
+    
+    console.log("handleDragStart called")
 
-    startX = parseInt(e.clientX - offsetX + window.scrollX); //clientX property returns the horizontal client coordinate of the mouse pointer
-    startY = parseInt(e.clientY - offsetY + window.scrollY); //clientY property returns the vertical client coordinate of the mouse pointer
-    //console.log("Y axis "+ startY, "\nX axis " + startX);
+    if (e.type.startsWith("touch")) {
+        const touch = e.touches[0] || e.changedTouches[0];
+        startX = Math.round(touch.clientX - offsetX + window.scrollX);
+        startY = Math.round(touch.clientY - offsetY + window.scrollY);
+        console.log("input is touch");
+    }
+    else {
+
+        startX = parseInt(e.clientX - offsetX + window.scrollX); //clientX property returns the horizontal client coordinate of the mouse pointer
+        startY = parseInt(e.clientY - offsetY + window.scrollY); //clientY property returns the vertical client coordinate of the mouse pointer
+        //console.log("Y axis "+ startY, "\nX axis " + startX);
+        console.log("input is mouse");
+    }
 
     for (let i = 0; i < cars.length; i++) {
         let car = cars[i];
         if (isMouseInShape(startX, startY, car)) {
             // Regular dragging behavior
+            console.log(startX, startY); 
             currentCarIndex = i;
             isDragging = true;
             return;
@@ -340,23 +282,13 @@ function mouseDown(e) {
     }
 }
 
-//find the middle point of the moving object
-function findMiddlePoint() {
-    //current shapes index needs to be used here or all the shapes default to the square of the first one.
-    middlePointLocation.x = cars[currentCarIndex].x + 100;
-    middlePointLocation.y = cars[currentCarIndex].y + 100;
-    //console.log("middle point location =", middlePointLocation);
-    //console.log("left hand side edge x co-ordinate = " + cars[currentCarIndex].x);
-    //console.log("left hand side edge y co-ordinate = " + cars[currentCarIndex].y);
-}
-
+//BUG need to have touchU and touchOut equivalent OR take the inputs from touch. 
 // mouse up event
 function mouseUp(e) {
     if (!isDragging) {
         return;
     } else {
         e.preventDefault();
-        findMiddlePoint();
         isDragging = false;
         snapTo();
     }
@@ -371,7 +303,9 @@ function mouseOut(e) {
     }
 }
 
-function mouseMove(e) {
+//BUG this function needs to be modified to take touch input
+//This function deals with the dragging logic when the car is actually moving. 
+function move(e) {
     if (!isDragging) {
         return;
     } else {
@@ -402,7 +336,7 @@ function mouseMove(e) {
             //console.log("This is the main car")
         }
 
-        //BUG! if the cars are moved too fast it can cause them to glitch through others
+        //BUG! if the cars are moved too fast it can cause them to glitch through others - add a speed limiter
         
         //prevents car leaving grid on x axis
         //need to create a car length variable to calculate the end bounds
@@ -444,10 +378,21 @@ function mouseMove(e) {
 }
 
 // listens for the mousedown event on the canvas
-canvas.onmousedown = mouseDown;
+canvas.onmousedown = handleDragStart;
+canvas.ontouchstart = handleDragStart;
+
+//deals with the move function if the mouse/touch is moving
+canvas.onmousemove = move;
+canvas.ontouchmove = move;
+
+//calls the snapTo function when mouse/touch input is removed
 canvas.onmouseup = mouseUp;
+canvas.ontouchend = mouseUp;
+
+//clears the dragging function, resets dragging to false
 canvas.onmouseout = mouseOut;
-canvas.onmousemove = mouseMove;
+canvas.ontouchend = mouseOut; //?
+
 
 //checks to see if the mouse is inside a shape
 function isMouseInShape(x, y, car) {
@@ -464,7 +409,7 @@ function isMouseInShape(x, y, car) {
         return false;
     }
 }
-
+//Snaps the cars to grid
 function snapTo() {
 
     let leftEdgeLocation = cars[currentCarIndex].x;
@@ -516,7 +461,7 @@ function snapTo() {
 
     winConditions(); //called after the draw shapes
 }
-
+//Counts the number of shape moves
 function numberOfMovesFunc() {
 
     if (isDragging) { //prevents numberOfMoves increasing if the car is being dragged against another
@@ -579,7 +524,7 @@ function numberOfMovesFunc() {
         }
     }
 }
-
+//checks to see if cars overlap
 function checkForOverLap() {
     //could also be called collision detection 
     //prevent car overlapping existing car
@@ -659,6 +604,7 @@ async function drawShapes() {
     }
 };
 
+//Have you won? 
 function winConditions() {
     if (currentCar.carLeftEdge > 598 && currentCar.carTop == 300 && currentCar.carBottom == 450) {
         console.log("whoop!")
