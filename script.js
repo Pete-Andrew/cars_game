@@ -27,6 +27,7 @@ let canvasHeight = canvas.height;
 //console.log("canvas height = ", canvasHeight);
 
 let currentCar;
+let touch;
 
 let startX;
 let startY;
@@ -230,10 +231,10 @@ function getEventPosition(event) {
     
     //deals with input, whether finger or mouse
     if (event.type.startsWith("touch")) {
-        const touch = event.touches[0] || event.changedTouches[0];
+        touch = event.touches[0] || event.changedTouches[0];
         x = touch.clientX - rect.left + window.scrollX;
         y = touch.clientY - rect.top + window.scrollY;
-        console.log("input is touch");
+        //console.log("input is touch");
     } else {
         x = event.clientX - rect.left + window.scrollX;
         y = event.clientY - rect.top + window.scrollY;
@@ -256,13 +257,15 @@ function handleDragStart(e) {
     
     console.log("handleDragStart called")
 
+    //if input type is touch
     if (e.type.startsWith("touch")) {
-        const touch = e.touches[0] || e.changedTouches[0];
-        startX = Math.round(touch.clientX - offsetX + window.scrollX);
+        touch = e.touches[0] || e.changedTouches[0];
+        startX = Math.round(touch.clientX - offsetX + window.scrollX); //provides a start point for the drag move
         startY = Math.round(touch.clientY - offsetY + window.scrollY);
         console.log("input is touch");
     }
-    else {
+    //else if input type is mouse:
+    else { 
 
         startX = parseInt(e.clientX - offsetX + window.scrollX); //clientX property returns the horizontal client coordinate of the mouse pointer
         startY = parseInt(e.clientY - offsetY + window.scrollY); //clientY property returns the vertical client coordinate of the mouse pointer
@@ -284,14 +287,11 @@ function handleDragStart(e) {
 
 //BUG need to have touchU and touchOut equivalent OR take the inputs from touch. 
 // mouse up event
-function mouseUp(e) {
-    if (!isDragging) {
-        return;
-    } else {
-        e.preventDefault();
-        isDragging = false;
-        snapTo();
-    }
+function handleEnd(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    isDragging = false;
+    snapTo();
 }
 
 function mouseOut(e) {
@@ -306,17 +306,39 @@ function mouseOut(e) {
 //BUG this function needs to be modified to take touch input
 //This function deals with the dragging logic when the car is actually moving. 
 function move(e) {
+
+    let moveX;
+    let moveY;
+
     if (!isDragging) {
         return;
     } else {
-        //console.log("move with dragging");
+        //console.log("move func called");
         e.preventDefault();
-        let mouseX = parseInt(e.clientX - offsetX + window.scrollX);
-        let mouseY = parseInt(e.clientY - offsetY + window.scrollY);
 
-        let mouseMoveDistanceX = mouseX - startX;
-        let mouseMoveDistanceY = mouseY - startY;
-        // console.log("distance from click, mouse X and mouse Y ", mouseMoveDistanceX, mouseMoveDistanceY)
+        //BUG need to handle touch input here!
+
+        //if touch is being used
+        if (e.type.startsWith("touch")) {
+            touch = e.touches[0] || e.changedTouches[0]; //this needs to be declared again in this function
+            moveX = Math.round(touch.clientX - offsetX + window.scrollX);
+            moveY = Math.round(touch.clientY - offsetY + window.scrollY);
+            
+            //console.log("Touch Move");
+            //console.log("Touch moveX", moveX)
+        } else {
+
+            //if mouse click is being used
+            moveX = parseInt(e.clientX - offsetX + window.scrollX);
+            moveY = parseInt(e.clientY - offsetY + window.scrollY);
+            //console.log("Mouse Move");
+            //console.log("Mouse moveX", moveX); 
+        }
+
+        let moveDistanceX = moveX - startX;
+        let moveDistanceY = moveY - startY;
+        
+        console.log("distance from click/tap, X and Y", moveDistanceX, moveDistanceY)
 
         currentCar = cars[currentCarIndex];
         //console.log(currentShape);
@@ -324,11 +346,11 @@ function move(e) {
 
         if (currentCar.orientation == "hrz") {
             //console.log(currentCar.orientation);
-            currentCar.x += mouseMoveDistanceX;
+            currentCar.x += moveDistanceX;
             currentCar.y = currentCar.y;
         } else if (currentCar.orientation == "vrt") {
             currentCar.x = currentCar.x;
-            currentCar.y += mouseMoveDistanceY;
+            currentCar.y += moveDistanceY;
         }
 
         //put in an exception for the escape car
@@ -372,12 +394,13 @@ function move(e) {
 
         drawShapes(); //live draws the shape so it can be physically dragged
         //console.log("square is moving")
-        startX = mouseX;
-        startY = mouseY;
+        //
+        startX = moveX;
+        startY = moveY;
     }
 }
 
-// listens for the mousedown event on the canvas
+//Listens for the mousedown event on the canvas
 canvas.onmousedown = handleDragStart;
 canvas.ontouchstart = handleDragStart;
 
@@ -386,13 +409,12 @@ canvas.onmousemove = move;
 canvas.ontouchmove = move;
 
 //calls the snapTo function when mouse/touch input is removed
-canvas.onmouseup = mouseUp;
-canvas.ontouchend = mouseUp;
+canvas.onmouseup = handleEnd;
+canvas.ontouchend = handleEnd;
 
-//clears the dragging function, resets dragging to false
-canvas.onmouseout = mouseOut;
-canvas.ontouchend = mouseOut; //?
-
+//clears the dragging function, resets dragging to false, but this is already handled by onMouse up? 
+//canvas.onmouseout = mouseOut;
+//canvas.ontouchend = mouseOut; //this causes no snapping for touchscreen
 
 //checks to see if the mouse is inside a shape
 function isMouseInShape(x, y, car) {
@@ -582,6 +604,7 @@ function checkForOverLap() {
     //x axis increases as it goes right
 }
 
+//Draw shapes is the live draw function
 async function drawShapes() {
     //console.log(tileName);
     context.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -604,7 +627,7 @@ async function drawShapes() {
     }
 };
 
-//Have you won? 
+//Have you won? This function triggers if you have 
 function winConditions() {
     if (currentCar.carLeftEdge > 598 && currentCar.carTop == 300 && currentCar.carBottom == 450) {
         console.log("whoop!")
