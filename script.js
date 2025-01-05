@@ -235,16 +235,43 @@ function getMousePosition(event) {
 
 canvas.addEventListener("mousedown", getMousePosition);
 
+//The next 3 functions handle touch screen interactions.
 //Mobile friendly touch screen code: 
 function getFingerPosition(touch) { //Not sure if this will work
     const rect = canvas.getBoundingClientRect(); // Get the canvas position
     const x = touch.clientX - rect.left + window.scrollX;
     const y = touch.clientY - rect.top + window.scrollY;
-    alert("you have touched it!");
+    //alert("you have touched it!");
     return { x, y };
 }
 
-canvas.addEventListener("touchstart", getFingerPosition);
+//canvas.addEventListener("touchstart", getFingerPosition);
+
+function handleTouchStart(event) {
+    event.preventDefault(); // Prevent scrolling
+    const touch = event.touches[0]; // Get the first touch point
+    const position = getFingerPosition(touch);
+    console.log("Finger Position:", position);
+    handleDragStart(position.x, position.y); // Use the normalized position
+}
+
+// Drag Start Handler (Shared Logic)
+function handleDragStart(x, y) {
+    startX = x;
+    startY = y;
+
+    for (let i = 0; i < cars.length; i++) {
+        let car = cars[i];
+        if (isMouseInShape(startX, startY, car)) {
+            currentCarIndex = i;
+            isDragging = true;
+            return;
+        }
+    }
+}
+
+// Add Event Listener
+canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
 
 //minimized as it is a long function, no longer used
 function checkCellRef(x, y) {
