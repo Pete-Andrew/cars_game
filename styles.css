@@ -13,6 +13,7 @@ canvas {
     display: block;
     margin: 0 auto;
     margin-top: auto;
+    width: 85%;
 }
 
 #counter {
