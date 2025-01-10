@@ -19,8 +19,7 @@ let canvasOffset = canvas.getBoundingClientRect();
 //stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
 
-//Applied in the CSS now
-// canvas.style.border = "5px solid black"
+canvas.style.border = "5px solid black"
 
 let canvasWidth = canvas.width;
 //console.log("canvas width = ", canvasWidth);
