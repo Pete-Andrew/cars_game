@@ -4,14 +4,6 @@ body {
     width: auto;
 }
 
-#headerDiv{
-    width: 900px;
-}
-
-#footerDiv {
-    width: 900px;
-}
-
 h1, p {
     text-align: center;
     margin: 10px;
@@ -22,7 +14,6 @@ canvas {
     margin: 0 auto;
     margin-top: auto;
     /* width: 85%;  */
-    border: 5px solid black;
 }
 
 #counter {
@@ -32,3 +23,12 @@ canvas {
 #level {
     text-align: center;
 }
+
+@media screen and (min-width: 400px) {
+    #headerDiv {
+      width: 900px;
+    }
+    #footerDiv {
+        width: 900px;
+    }
+  }
