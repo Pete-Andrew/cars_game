@@ -19,7 +19,8 @@ let canvasOffset = canvas.getBoundingClientRect();
 //stores the value for the center of the cube
 let middlePointLocation = { x: 0, y: 0 };
 
-canvas.style.border = "5px solid black"
+//Applied in the CSS now
+// canvas.style.border = "5px solid black"
 
 let canvasWidth = canvas.width;
 //console.log("canvas width = ", canvasWidth);
@@ -43,7 +44,7 @@ let currentCarOldPositionY
 let currentCarOldPositionX
 let currentCarNewPositionY
 let currentCarNewPositionX
-let level = 3;
+let level = 2;
 
 let numberOfMoves = 0;
 counterElement.textContent = numberOfMoves;
@@ -226,14 +227,14 @@ drawCars();
 
 function getEventPosition(event) {
 
-    //const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promted these to global variables
+    //const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promoted these to global variables
     //let x, y;
     
     //deals with input, whether finger or mouse
     if (event.type.startsWith("touch")) {
         touch = event.touches[0] || event.changedTouches[0];
-        x = touch.clientX - rect.left + window.scrollX;
-        y = touch.clientY - rect.top + window.scrollY;
+        x = (touch.clientX - rect.left + window.scrollX);
+        y = (touch.clientY - rect.top + window.scrollY);
         //console.log("input is touch");
     } else {
         x = event.clientX - rect.left + window.scrollX;
@@ -242,7 +243,7 @@ function getEventPosition(event) {
 
     //console.log("Rect:", rect);
     //console.log("ScrollX:", window.scrollX, "ScrollY:", window.scrollY);
-    //console.log("Coordinate x: " + x, "Coordinate y: " + y);
+    console.log("Coordinate x: " + x, "Coordinate y: " + y);
     //checkCellRef(x, y);
     return { x, y };
 }
