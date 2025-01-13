@@ -25,6 +25,13 @@ canvas {
 }
 
 @media screen and (max-width: 500px) {
+
+    body {
+        margin: 0;
+        padding: 0;
+        width: auto;
+    }
+    
     #headerDiv {
       width: 900px;
     }
