@@ -2,6 +2,8 @@ const levelData = {
 
   0: [
     { mainCar: true,"x": 450, "y": 300, "width": 300, "height": 150, "carLeftEdge": 450, "carRightEdge": 750, "carTop": 300, "carBottom": 450, "color": "#ff0000", "orientation": "hrz", "hasMoved": false, "initialPosition": { "carLeftEdge": 450, "carRightEdge": 750, "carTop": 300, "carBottom": 450 } },
+    { "x": 750, "y": 150, "width": 150, "height": 450, "carLeftEdge": 750, "carRightEdge": 900, "carTop": 150, "carBottom": 600, "color": "#ff00f2", "orientation": "vrt", "hasMoved": false, "initialPosition": { "carLeftEdge": 750, "carRightEdge": 900, "carTop": 150, "carBottom": 600 } },
+
   ],
 
   1: [
@@ -15,9 +17,9 @@ const levelData = {
 
   2: [
     { x: 0, y: 0, width: 450, height: 150, carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150, color: 'green', orientation: 'hrz', hasMoved: false, initialPosition: { carLeftEdge: 0, carRightEdge: 450, carTop: 0, carBottom: 150 } },
-    { x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'red', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300 } },
+    { x: 450, y: 0, width: 150, height: 300, carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300, color: 'orange', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 450, carRightEdge: 600, carTop: 0, carBottom: 300 } },
     { x: 450, y: 450, width: 300, height: 150, carLeftEdge: 450, carRightEdge: 750, carTop: 450, carBottom: 600, color: 'blue', orientation: 'hrz', hasMoved: false, initialPosition: { carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450 } },
-    { mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'orange', orientation: 'hrz', hasMoved: false, initialPosition: { carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450 } },
+    { mainCar: true, x: 0, y: 300, width: 300, height: 150, carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450, color: 'red', orientation: 'hrz', hasMoved: false, initialPosition: { carLeftEdge: 0, carRightEdge: 300, carTop: 300, carBottom: 450 } },
     { x: 300, y: 150, width: 150, height: 450, carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600, color: 'teal', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 300, carRightEdge: 450, carTop: 150, carBottom: 600 } },
     { x: 750, y: 0, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300, color: 'pink', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 750, carRightEdge: 900, carTop: 0, carBottom: 300 } },
     { x: 750, y: 300, width: 150, height: 300, carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600, color: 'grey', orientation: 'vrt', hasMoved: false, initialPosition: { carLeftEdge: 750, carRightEdge: 900, carTop: 300, carBottom: 600 } },

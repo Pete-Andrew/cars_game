@@ -7,8 +7,9 @@ let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 const counterElement = document.getElementById("counter");
 const levelDisplay = document.getElementById("level");
-const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promted these to global variables
-let x, y;
+const rect = canvas.getBoundingClientRect(); // Get the canvas position //I have promoted these to global variables
+const forwardBtn = document.getElementById("forwardBtn");
+const backBtn = document.getElementById("backBtn");
 
 //to set it to a px size you don't need speech marks or 'px' at the end.
 canvas.width = 900;
@@ -43,17 +44,64 @@ let currentCarOldPositionY
 let currentCarOldPositionX
 let currentCarNewPositionY
 let currentCarNewPositionX
-let level = 0;
+let level = 1;
 
-//Bug: once level one is completed move to level 2
+//Bug: 
 //high scores in local storage
-//Forward / back ward arrows for levels
 //Phone screen resizing... 
 //confetti on win
 
 let numberOfMoves = 0;
 counterElement.textContent = numberOfMoves;
 levelDisplay.textContent = level;
+
+let x, y;
+//can set the total values manually e.g. let totalLevels = 2, or can get the value by counting the objects keys as below
+let totalLevels = (Object.keys(levelData).length) -1; 
+console.log(totalLevels)
+
+forwardBtn.addEventListener("click", skipForward)
+
+function skipForward() {
+    if (level < totalLevels) {
+        console.log("Forward button clicked");
+        //load level
+        level++
+        //clear existing cars
+        clearCars();
+        drawVertGrid(); //makes sure the grid is redrawn properly as clear cars can cause problems
+        drawHorizGrid();
+        cars = [];
+        loadCars(level);
+        numberOfMoves = 0;
+        counterElement.textContent = numberOfMoves;
+        levelDisplay.textContent = level; //updates level tracker
+        drawCars();
+    }
+}
+
+backBtn.addEventListener("click", skipBackward)
+
+function skipBackward() {
+    if (level > 0) {
+        console.log("Back button clicked");
+        //load level
+        level--
+        //clear existing cars
+        clearCars();
+        drawVertGrid(); //makes sure the grid is redrawn properly as clear cars can cause problems
+        drawHorizGrid();
+        cars = [];
+        loadCars(level);
+        numberOfMoves = 0;
+        counterElement.textContent = numberOfMoves;
+        levelDisplay.textContent = level; //updates level tracker
+        drawCars();
+    }
+}
+
+
+
 
 //co-ordinates for cells e.g. A1, B2 etc. 
 let cellCoords = {
@@ -281,7 +329,7 @@ function handleDragStart(e) {
         let car = cars[i];
         if (isMouseInShape(startX, startY, car)) {
             // Regular dragging behavior
-            console.log(startX, startY); 
+            //console.log(startX, startY); 
             currentCarIndex = i;
             isDragging = true;
             return;
@@ -338,7 +386,7 @@ function move(e) {
         let moveDistanceX = moveX - startX;
         let moveDistanceY = moveY - startY;
         
-        console.log("distance from click/tap, X and Y", moveDistanceX, moveDistanceY)
+        //console.log("distance from click/tap, X and Y", moveDistanceX, moveDistanceY)
 
         currentCar = cars[currentCarIndex];
         //console.log(currentShape);
@@ -493,7 +541,7 @@ function numberOfMovesFunc() {
         //if the car has never moved then set previousPosition to current. 
         if (currentCar.hasMoved == false) {
             //console.log("This car has never previously moved");
-            console.log("car.InitialPosition" , currentCar.initialPosition);
+            //console.log("car.InitialPosition" , currentCar.initialPosition);
 
             if (currentCar.carLeftEdge !== currentCar.initialPosition.carLeftEdge
                 || currentCar.carRightEdge !== currentCar.initialPosition.carRightEdge
@@ -522,9 +570,9 @@ function numberOfMovesFunc() {
             };
         }
 
-        console.log("currentCar", currentCar);
-        console.log("InitialPosition", currentCar.initialPosition);
-        console.log("previousPosition", currentCar.previousPosition);
+        //console.log("currentCar", currentCar);
+        //console.log("InitialPosition", currentCar.initialPosition);
+        //console.log("previousPosition", currentCar.previousPosition);
 
         //compares the currentCar location with the current cars's previous location.
         if (currentCar.carLeftEdge !== currentCar.previousPosition.carLeftEdge
@@ -620,6 +668,12 @@ async function drawShapes() {
     }
 };
 
+function clearCars() {
+    for (let car of cars) {
+        context.clearRect(car.x, car.y, car.width, car.height);
+    }
+}
+
 //Have you won? This function triggers if you have 
 function winConditions() {
     if (currentCar.carLeftEdge > 598 && currentCar.carTop == 300 && currentCar.carBottom == 450) {
@@ -627,25 +681,106 @@ function winConditions() {
         alert("Rah Gumba! \nYou have freed the beast!")
         //if the car has the attribute 'maincar' is in cells C5 and C6 
         //win condition = true 
-
-        //clear level
-        
+                
         //load level
         level++
         
         //clear existing cars
-        
-        //
+        clearCars();
+        drawVertGrid(); //makes sure the grid is redrawn properly as clear cars can cause problems
+        drawHorizGrid();
+
         cars = [];
         loadCars(level);
-        levelDisplay.textContent = level;
-        drawCars();
-        console.log("Level", level)
+        
+        numberOfMoves = 0;
+        counterElement.textContent = numberOfMoves;
 
+        levelDisplay.textContent = level; //updates level tracker
+        drawCars();
+        //console.log("Level", level)
+        partyHorn();
+        confettiFunc();
     }
 }
 
+function partyHorn() {
+    var audio = new Audio('party_horn.mp3');
+    audio.play();
+  }
 
+//All parts of the confetti sequence are nested in the below function. 
+function confettiFunc() {
+
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+
+    //Comments:
+    var count = 200;
+    var defaults = {
+        origin: { y: 0.7 }
+    };
+
+    function fire(particleRatio, opts) {
+        confetti({
+            ...defaults,
+            ...opts,
+            particleCount: Math.floor(count * particleRatio)
+        });
+    }
+
+    fire(0.25, {
+        spread: 26,
+        startVelocity: 55,
+    });
+    fire(0.2, {
+        spread: 60,
+    });
+    fire(0.35, {
+        spread: 100,
+        decay: 0.91,
+        scalar: 0.8
+    });
+    fire(0.1, {
+        spread: 120,
+        startVelocity: 25,
+        decay: 0.92,
+        scalar: 1.2
+    });
+    fire(0.1, {
+        spread: 120,
+        startVelocity: 45,
+    });
+
+    function fireworks() {
+
+        var duration = 2 * 1000; //set firework duration time
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        var interval = setInterval(function () {
+            var timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            var particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+        }, 250);
+    }
+
+    fireworks();
+}
 
 //.forEach
 //.some
