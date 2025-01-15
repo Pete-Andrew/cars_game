@@ -43,7 +43,13 @@ let currentCarOldPositionY
 let currentCarOldPositionX
 let currentCarNewPositionY
 let currentCarNewPositionX
-let level = 2;
+let level = 0;
+
+//Bug: once level one is completed move to level 2
+//high scores in local storage
+//Forward / back ward arrows for levels
+//Phone screen resizing... 
+//confetti on win
 
 let numberOfMoves = 0;
 counterElement.textContent = numberOfMoves;
@@ -130,7 +136,6 @@ function drawHorizGrid() {
         context.fillRect(horizGridLine.x, horizGridLine.y, horizGridLine.width, horizGridLine.height)
         // console.log(horizGridLine)
         drawExit();
-
     }
 }
 drawHorizGrid();
@@ -217,9 +222,8 @@ loadCars(level);
 
 function drawCars() {
     for (let car of cars) {
-        context.fillStyle = car.color; //Sets the fillstyle e.g. colour
+        context.fillStyle = car.color; //Sets the fillStyle e.g. colour
         context.fillRect(car.x, car.y, car.width, car.height) //the fillRect() method draws a "filled" rectangle.
-        
     }
 }
 drawCars();
@@ -285,7 +289,6 @@ function handleDragStart(e) {
     }
 }
 
-//BUG need to have touchU and touchOut equivalent OR take the inputs from touch. 
 // mouse up event
 function handleEnd(e) {
     if (!isDragging) return;
@@ -303,7 +306,6 @@ function mouseOut(e) {
     }
 }
 
-//BUG this function needs to be modified to take touch input
 //This function deals with the dragging logic when the car is actually moving. 
 function move(e) {
 
@@ -315,8 +317,6 @@ function move(e) {
     } else {
         //console.log("move func called");
         e.preventDefault();
-
-        //BUG need to handle touch input here!
 
         //if touch is being used
         if (e.type.startsWith("touch")) {
@@ -551,7 +551,6 @@ function checkForOverLap() {
     //could also be called collision detection 
     //prevent car overlapping existing car
     //need to get all of the cars edge co-ordinates
-    //BUG initialPosition is not being read somewhere
     
     cars[currentCarIndex].carLeftEdge = currentCar.x;
     cars[currentCarIndex].carRightEdge = currentCar.x + currentCar.width;
@@ -583,13 +582,7 @@ function checkForOverLap() {
             //console.log("isOverlapping =", isOverlapping)
             //console.log("Overlap detected with", cars[i].color,"car, at cars index:", i); 
             //calling snapTo prevents further movement as it is constantly called if if overlap is detected 
-            //console.log("currentCar" , currentCar);
-
-            //BUGS! if pieces are moved too fast they can overlap. 
-            //some sort of speed limiter
-            //occasionally some of the cars seem not to get snapped to squares
-            //easy way to make new levels? store car layout data as a JSON? 
-            //win conditions, win message, confetti 
+            //console.log("currentCar" , currentCar);        
 
             snapTo();
             //call snap to func if overlap is detected
@@ -634,6 +627,21 @@ function winConditions() {
         alert("Rah Gumba! \nYou have freed the beast!")
         //if the car has the attribute 'maincar' is in cells C5 and C6 
         //win condition = true 
+
+        //clear level
+        
+        //load level
+        level++
+        
+        //clear existing cars
+        
+        //
+        cars = [];
+        loadCars(level);
+        levelDisplay.textContent = level;
+        drawCars();
+        console.log("Level", level)
+
     }
 }
 
